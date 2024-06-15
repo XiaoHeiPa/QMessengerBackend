@@ -20,14 +20,14 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
+    maven ( url = "https://maven.aliyun.com/repository/public" )
 }
 
 dependencies {
     implementation("com.auth0:java-jwt:4.3.0")
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.37")
-    implementation("com.baomidou:mybatis-plus-boot-starter:3.5.3.1")
+    implementation("com.mybatis-flex:mybatis-flex-spring-boot-starter:1.9.2")
 
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
@@ -37,18 +37,21 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.security:spring-security-messaging")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
-//    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.session:spring-session-jdbc")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.mysql:mysql-connector-j")
+    implementation("com.mysql:mysql-connector-j")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-//    testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3")
+    testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    annotationProcessor("com.mybatis-flex:mybatis-flex-processor:1.9.2")
+    implementation("com.mybatis-flex:mybatis-flex-codegen:1.8.3")
+    implementation("com.zaxxer:HikariCP:4.0.3")
 }
 
 tasks.withType<Test> {

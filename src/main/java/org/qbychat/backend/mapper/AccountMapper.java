@@ -1,11 +1,14 @@
 package org.qbychat.backend.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+import com.mybatisflex.core.BaseMapper;
 import org.qbychat.backend.entity.Account;
 
-
-@Mapper
+/**
+ * 映射层。
+ *
+ * @author zszf
+ * @since 2024-06-15
+ */
 public interface AccountMapper extends BaseMapper<Account> {
-}
 
+}

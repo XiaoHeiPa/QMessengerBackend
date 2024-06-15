@@ -1,9 +1,16 @@
 package org.qbychat.backend.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.mybatisflex.core.service.IService;
 import org.qbychat.backend.entity.Account;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface AccountService extends UserDetailsService, IService<Account> {
+/**
+ * 服务层。
+ *
+ * @author zszf
+ * @since 2024-06-15
+ */
+public interface AccountService extends IService<Account>, UserDetailsService {
     Account findAccountByNameOrEmail(String text);
+
 }

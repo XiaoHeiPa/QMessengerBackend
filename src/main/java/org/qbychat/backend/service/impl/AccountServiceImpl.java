@@ -1,6 +1,7 @@
 package org.qbychat.backend.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.mapper.AccountMapper;
 import org.qbychat.backend.service.AccountService;
@@ -9,14 +10,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static org.qbychat.backend.entity.table.AccountTableDef.ACCOUNT;
+
+/**
+ * 服务层实现。
+ *
+ * @author zszf
+ * @since 2024-06-15
+ */
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = findAccountByNameOrEmail(username);
         if (account == null) {
-            throw new UsernameNotFoundException("Username or password wrong");
+            throw new UsernameNotFoundException(username);
         }
         return User.withUsername(username)
                 .password(account.getPassword())
@@ -24,17 +32,11 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .build();
     }
 
-    /**
-     * Get account
-     * @param text Username or email
-     * */
-    public Account findAccountByNameOrEmail(String text) {
-        return this.query()
-                .eq("username", text).or()
-                .eq("email", text).one();
+    public Account findAccountByNameOrEmail(String username) {
+        return this.getMapper().selectOneByQuery(QueryWrapper.create().where(ACCOUNT.USERNAME.eq(username).or(ACCOUNT.EMAIL.eq(username))));
     }
 
     public Account findAccountByMinecraft(String uuid) {
-        return this.query().eq("minecraftUuid", uuid).one();
+        return this.getMapper().selectOneByQuery(QueryWrapper.create().where(ACCOUNT.MINECRAFT_UUID.eq(uuid)));
     }
 }

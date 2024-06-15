@@ -1,25 +1,44 @@
 package org.qbychat.backend.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
+import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+/**
+ * 实体类。
+ *
+ * @author zszf
+ * @since 2024-06-15
+ */
 @Data
-@TableName("db_account")
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@Table(value = "db_account")
 public class Account implements BaseData {
-    @TableId(type = IdType.AUTO)
-    Integer id;
-    String username;
-    String password;
-    String email;
-    String role;
-    String minecraftUuid;
-    Date registerTime;
+
+    @Id(keyType = KeyType.Auto)
+    private Integer id;
+
+    private String username;
+
+    private String password;
+
+    private String email;
+
+    private String role;
+
+    @Column(value = "minecraftUuid")
+    private String minecraftUuid;
+
+    @Column(value = "registerTime")
+    private LocalDateTime registerTime;
+
 }
