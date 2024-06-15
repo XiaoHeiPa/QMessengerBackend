@@ -40,7 +40,7 @@ public class SecurityConfig {
                         conf -> conf
                                 .requestMatchers("/user/login").anonymous()
                                 .requestMatchers("/user/register").anonymous()
-                                .requestMatchers("/ws").hasAnyRole()
+                                .requestMatchers("/ws").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(
