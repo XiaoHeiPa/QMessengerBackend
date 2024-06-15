@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: QMessagerBackend
+  security:
+    jwt:
+      key: abc-def
+      expire: 7
+  datasource:
+    url: jdbc:mysql://localhost:3306/qbychat
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
