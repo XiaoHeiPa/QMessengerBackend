@@ -33,6 +33,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .build();
     }
 
+    public void registerAccount(Account account) {
+        this.mapper.insert(account);
+    }
+
     public Account findAccountByNameOrEmail(String username) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(ACCOUNT.ALL_COLUMNS)
