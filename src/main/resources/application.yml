@@ -10,7 +10,3 @@ spring:
     username: proc
     password: qbychatproc114514%
     driver-class-name: com.mysql.cj.jdbc.Driver
-  devtools:
-    restart:
-      # 防止Account不加載
-      enabled: false
