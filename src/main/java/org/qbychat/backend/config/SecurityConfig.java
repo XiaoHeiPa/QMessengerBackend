@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.AuthorizeVO;
 import org.qbychat.backend.entity.RestBean;
+import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.filter.JwtAuthorizeFilter;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
@@ -49,7 +50,7 @@ public class SecurityConfig {
                                 .requestMatchers("/user/login").anonymous()
                                 .requestMatchers("/user/register").anonymous()
                                 .requestMatchers("/user/**").authenticated()
-                                .requestMatchers("/admin").hasRole("admin")
+                                .requestMatchers("/admin").hasRole(Roles.ADMIN)
                                 .anyRequest().permitAll()
                 )
                 .formLogin(

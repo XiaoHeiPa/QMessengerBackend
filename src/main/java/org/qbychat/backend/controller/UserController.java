@@ -3,9 +3,9 @@ package org.qbychat.backend.controller;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
-import lombok.val;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
+import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +34,7 @@ public class UserController {
         account.setEmail(email);
         account.setNickname(username);
         account.setRegisterTime(LocalDateTime.now());
+        account.setRole(Roles.USER);
         account.setPassword(passwordEncoder.encode(password));
         if (accountService.findAccountByNameOrEmail(account.getUsername()) != null) {
             return RestBean.failure(401, "User exist.");
