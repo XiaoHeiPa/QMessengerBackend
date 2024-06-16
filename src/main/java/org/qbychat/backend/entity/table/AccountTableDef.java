@@ -12,10 +12,6 @@ import java.io.Serial;
  * @since 2024-06-15
  */
 public class AccountTableDef extends TableDef {
-
-    /**
-     *
-     */
     public static final AccountTableDef ACCOUNT = new AccountTableDef();
     @Serial
     private static final long serialVersionUID = 1L;
@@ -37,7 +33,7 @@ public class AccountTableDef extends TableDef {
     public final QueryColumn REGISTER_TIME = new QueryColumn(this, "registerTime");
 
 
-    public final QueryColumn MINECRAFT_UUID = new QueryColumn(this, "minecraftUuid");
+    public final QueryColumn NICKNAME = new QueryColumn(this, "nickname");
 
     /**
      * 所有字段。
@@ -47,7 +43,7 @@ public class AccountTableDef extends TableDef {
     /**
      * 默认字段，不包含逻辑删除或者 large 等字段。
      */
-    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, USERNAME, PASSWORD, EMAIL, ROLE, MINECRAFT_UUID, REGISTER_TIME};
+    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, USERNAME, PASSWORD, EMAIL, ROLE, NICKNAME, REGISTER_TIME};
 
     public AccountTableDef() {
         super("", "db_account");

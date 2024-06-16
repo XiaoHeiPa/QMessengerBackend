@@ -26,19 +26,11 @@ public class Account implements BaseData {
 
     @Id(keyType = KeyType.Auto)
     private Integer id;
-
     private String username;
-
     private String password;
-
     private String email;
-
     private String role;
-
-    @Column(value = "minecraftUuid")
-    private String minecraftUuid;
-
     @Column(value = "registerTime")
     private LocalDateTime registerTime;
-
+    private String nickname;
 }

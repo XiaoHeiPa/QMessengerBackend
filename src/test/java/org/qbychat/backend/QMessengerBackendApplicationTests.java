@@ -14,6 +14,6 @@ class QMessengerBackendApplicationTests {
     @Test
     void newPassword(){
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        System.out.println(bCryptPasswordEncoder.encode("dys2010"));
+        System.out.println(bCryptPasswordEncoder.encode("114514"));
     }
 }

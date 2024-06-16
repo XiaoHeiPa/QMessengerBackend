@@ -40,10 +40,7 @@ public class SecurityConfig {
                         conf -> conf
                                 .requestMatchers("/user/login").anonymous()
                                 .requestMatchers("/user/register").anonymous()
-                                .requestMatchers("/ws").authenticated()
-                                .requestMatchers("/").permitAll()
-                                .requestMatchers("/getUserInfo").permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .formLogin(
                         conf -> conf

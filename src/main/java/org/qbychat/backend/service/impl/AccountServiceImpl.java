@@ -35,8 +35,4 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     public Account findAccountByNameOrEmail(String username) {
         return this.getMapper().selectOneByQuery(QueryWrapper.create().where(ACCOUNT.USERNAME.eq(username).or(ACCOUNT.EMAIL.eq(username))));
     }
-
-    public Account findAccountByMinecraft(String uuid) {
-        return this.getMapper().selectOneByQuery(QueryWrapper.create().where(ACCOUNT.MINECRAFT_UUID.eq(uuid)));
-    }
 }

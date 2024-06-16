@@ -7,13 +7,15 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
 import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 
-//@Configuration
-//@EnableWebSocketSecurity
+@Configuration
+@EnableWebSocketSecurity
 public class WebSocketSecurityConfig {
     @Bean
     AuthorizationManager<Message<?>> messageAuthorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
         messages
-                .anyMessage().denyAll();
+                .nullDestMatcher().authenticated()
+                .simpDestMatchers("/ws").authenticated()
+                .anyMessage().denyAll();;
 
         return messages.build();
     }
