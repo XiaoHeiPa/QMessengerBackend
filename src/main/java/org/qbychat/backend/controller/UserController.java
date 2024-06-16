@@ -35,10 +35,10 @@ public class UserController {
         account.setNickname(username);
         account.setRegisterTime(LocalDateTime.now());
         account.setPassword(passwordEncoder.encode(password));
-        if (accountService.findAccountByNameOrEmail(account.getUsername()) == null) {
+        if (accountService.findAccountByNameOrEmail(account.getUsername()) != null) {
             return RestBean.failure(401, "User exist.");
         }
-        if (accountService.findAccountByNameOrEmail(account.getEmail()) == null) {
+        if (accountService.findAccountByNameOrEmail(account.getEmail()) != null) {
             return RestBean.failure(401, "Email exist.");
         }
         accountService.registerAccount(account);
