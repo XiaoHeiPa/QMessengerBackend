@@ -13,7 +13,7 @@ public class WebSocketSecurityConfig {
     @Bean
     AuthorizationManager<Message<?>> messageAuthorizationManager(MessageMatcherDelegatingAuthorizationManager.Builder messages) {
         messages
-                .simpDestMatchers("/user/**").hasRole("USER");
+                .anyMessage().denyAll();
 
         return messages.build();
     }
