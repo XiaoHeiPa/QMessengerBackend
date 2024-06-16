@@ -41,6 +41,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         qw.select(ACCOUNT.ALL_COLUMNS)
                 .where(ACCOUNT.USERNAME.eq(username))
                 .or(ACCOUNT.EMAIL.eq(username));
-        return this.mapper.selectOneByQuery(qw);
+        return (Account) this.mapper.selectOneByQuery(qw);
     }
 }
