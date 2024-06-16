@@ -10,6 +10,8 @@ import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/user")
 @Log4j2
@@ -26,7 +28,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public RestBean<String> registerUser(@RequestParam Account account) {
+    public RestBean<String> register(@RequestParam String username, @RequestParam String email, @RequestParam String password) {
+        Account account = new Account();
+        account.setUsername(username);
+        account.setEmail(email);
+        account.setNickname(username);
+        account.setRegisterTime(LocalDateTime.now());
+        account.setPassword(passwordEncoder.encode(password));
         if (accountService.findAccountByNameOrEmail(account.getUsername()) == null) {
             return RestBean.failure(401, "User exist.");
         }
