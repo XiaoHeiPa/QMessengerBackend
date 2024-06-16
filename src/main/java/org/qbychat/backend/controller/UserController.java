@@ -42,7 +42,7 @@ public class UserController {
         if (accountService.findAccountByNameOrEmail(account.getEmail()) != null) {
             return RestBean.failure(401, "Email exist.");
         }
-        log.info("User " + account.getUsername() + " registered.");
+        log.info("User " + account.getUsername() + " was registered.");
         accountService.registerAccount(account);
         return RestBean.success("User registered.");
     }
