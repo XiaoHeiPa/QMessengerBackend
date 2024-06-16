@@ -5,13 +5,10 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.mapper.AccountMapper;
 import org.qbychat.backend.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 import static org.qbychat.backend.entity.table.AccountTableDef.ACCOUNT;
 
@@ -41,6 +38,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         qw.select(ACCOUNT.ALL_COLUMNS)
                 .where(ACCOUNT.USERNAME.eq(username))
                 .or(ACCOUNT.EMAIL.eq(username));
-        return (Account) this.mapper.selectOneByQuery(qw);
+        return this.mapper.selectOneByQuery(qw);
     }
 }
