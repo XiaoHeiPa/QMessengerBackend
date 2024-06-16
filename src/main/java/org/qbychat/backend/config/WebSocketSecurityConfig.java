@@ -15,7 +15,7 @@ public class WebSocketSecurityConfig {
         messages
                 .nullDestMatcher().authenticated()
                 .simpDestMatchers("/ws").authenticated()
-                .anyMessage().denyAll();;
+                .anyMessage().denyAll();
 
         return messages.build();
     }

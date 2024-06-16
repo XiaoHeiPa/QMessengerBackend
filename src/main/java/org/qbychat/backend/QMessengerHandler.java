@@ -8,8 +8,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.security.Principal;
-
 @Log4j2
 public class QMessengerHandler extends TextWebSocketHandler {
     @Override

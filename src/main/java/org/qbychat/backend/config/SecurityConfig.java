@@ -28,16 +28,18 @@ import java.io.PrintWriter;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
     @Resource
     AccountServiceImpl accountService;
     @Resource
     JwtUtils jwtUtils;
     @Resource
     JwtAuthorizeFilter filter;
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
