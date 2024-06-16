@@ -2,7 +2,7 @@ package org.qbychat.backend.controller;
 
 import jakarta.annotation.Resource;
 import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.R;
+import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,14 +14,14 @@ public class RegisterController {
     private AccountServiceImpl accountService;
 
     @PostMapping("/register")
-    public R<String> registerUser(@RequestParam Account account){
-        if(accountService.findAccountByNameOrEmail(account.getUsername())==null){
-            return R.error(401, "User exist.");
+    public RestBean<String> registerUser(@RequestParam Account account) {
+        if (accountService.findAccountByNameOrEmail(account.getUsername()) == null) {
+            return RestBean.failure(401, "User exist.");
         }
-        if(accountService.findAccountByNameOrEmail(account.getEmail())==null){
-            return R.error(401, "Email exist.");
+        if (accountService.findAccountByNameOrEmail(account.getEmail()) == null) {
+            return RestBean.failure(401, "Email exist.");
         }
         accountService.registerAccount(account);
-        return R.success("User registered.");
+        return RestBean.success("User registered.");
     }
 }
