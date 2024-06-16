@@ -23,8 +23,6 @@ import static org.qbychat.backend.entity.table.AccountTableDef.ACCOUNT;
  */
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
-    @Autowired
-    public AccountMapper accountMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -39,8 +37,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     public Account findAccountByNameOrEmail(String username) {
-        Account name = accountMapper.selectOneByQuery(QueryWrapper.create().where(ACCOUNT.USERNAME.eq(username)));
-        Account email = accountMapper.selectOneByQuery(QueryWrapper.create().where(ACCOUNT.EMAIL.eq(username)));
-        return Objects.requireNonNullElse(name, email);
+        QueryWrapper qw = new QueryWrapper();
+        qw.select(ACCOUNT.ALL_COLUMNS)
+                .where(ACCOUNT.USERNAME.eq(username))
+                .or(ACCOUNT.EMAIL.eq(username));
+        return this.mapper.selectOneByQuery(qw);
     }
 }
