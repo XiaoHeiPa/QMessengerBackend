@@ -1,9 +1,11 @@
 package org.qbychat.backend.controller;
 
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.qbychat.backend.entity.RestBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @Log4j2
 public class UserController {
+    @Resource
+    BCryptPasswordEncoder passwordEncoder;
+
     @GetMapping("whoami")
     public RestBean<String> whoAmI(HttpServletRequest request) {
         return RestBean.success(request.getUserPrincipal().getName());
