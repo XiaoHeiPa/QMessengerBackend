@@ -48,6 +48,8 @@ public class SecurityConfig {
                         conf -> conf
                                 .requestMatchers("/user/login").anonymous()
                                 .requestMatchers("/user/register").anonymous()
+                                .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/admin").hasRole("admin")
                                 .anyRequest().permitAll()
                 )
                 .formLogin(
