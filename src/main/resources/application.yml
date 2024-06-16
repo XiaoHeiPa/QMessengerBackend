@@ -6,9 +6,9 @@ spring:
       key: abc-def
       expire: 7
   datasource:
-    url: jdbc:mysql://localhost:3306/qbychat
-    username: root
-    password: dys2010
+    url: jdbc:mysql://qbychat-global.mysql.polardb.rds.aliyuncs.com:3306/qbychat
+    username: qbychat
+    password: qbychat2024!
     driver-class-name: com.mysql.cj.jdbc.Driver
 server:
   port: 2333
