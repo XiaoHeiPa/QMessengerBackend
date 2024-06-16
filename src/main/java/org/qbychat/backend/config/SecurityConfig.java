@@ -41,17 +41,19 @@ public class SecurityConfig {
                                 .requestMatchers("/user/login").anonymous()
                                 .requestMatchers("/user/register").anonymous()
                                 .requestMatchers("/ws").authenticated()
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/getUserInfo").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(
                         conf -> conf
-                                .loginProcessingUrl("/api/auth/login")
+                                .loginProcessingUrl("/user/login")
                                 .successHandler(this::onAuthenticationSuccessful)
                                 .failureHandler(this::onAuthenticationFailure)
                 )
                 .logout(
                         conf -> conf
-                                .logoutUrl("/api/auth/logout")
+                                .logoutUrl("/user/logout")
                                 .logoutSuccessHandler(this::onLogoutSuccess)
                 )
                 .exceptionHandling(conf -> conf

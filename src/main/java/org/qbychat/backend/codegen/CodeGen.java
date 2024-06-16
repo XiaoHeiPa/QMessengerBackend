@@ -7,9 +7,9 @@ import com.zaxxer.hikari.HikariDataSource;
 public class CodeGen {
     public static void main(String[] args) {
         HikariDataSource ds = new HikariDataSource();
-        ds.setJdbcUrl("jdbc:mysql://localhost:3306/qbychat");
-        ds.setUsername("root");
-        ds.setPassword("dys2010");
+        ds.setJdbcUrl("jdbc:mysql://qbychat-global.mysql.polardb.rds.aliyuncs.com:3306/qbychat");
+        ds.setUsername("qbychat");
+        ds.setPassword("qbychat2024!");
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setBasePackage("org.qbychat.backend");
         globalConfig.setServiceGenerateEnable(true);
