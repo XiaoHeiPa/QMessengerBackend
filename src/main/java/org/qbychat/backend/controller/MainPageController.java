@@ -9,6 +9,6 @@ public class MainPageController {
     @GetMapping("/")
     @ResponseBody
     public String index() {
-        return "QMessengerBackend";
+        return "QMessengerBackend"+System.currentTimeMillis();
     }
 }
