@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
-import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/user")
@@ -53,6 +50,8 @@ public class UserController {
         redisTemplate.opsForValue().set(String.valueOf(newAccountUuid), newAccount);
         return RestBean.success(newAccount.getUsername());
     }
+
+    //TODO: email verify
 
     @GetMapping("/apply-register")
     public RestBean<String> applyRegister(@RequestParam("uuid") String uuid) {
