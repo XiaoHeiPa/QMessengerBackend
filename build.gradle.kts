@@ -29,7 +29,7 @@ dependencies {
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.37")
     implementation("com.mybatis-flex:mybatis-flex-spring-boot-starter:1.9.2")
-
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")

@@ -11,13 +11,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @Log4j2
 public class QMessengerHandler extends TextWebSocketHandler {
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
         session.sendMessage(new TextMessage(RestBean.success().toJson()));
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    protected void handleTextMessage(@NotNull WebSocketSession session, @NotNull TextMessage message) throws Exception {
         super.handleTextMessage(session, message);
         log.info(message.getPayload());
     }
