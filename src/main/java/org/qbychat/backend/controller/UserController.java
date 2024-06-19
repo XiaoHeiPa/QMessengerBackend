@@ -1,17 +1,20 @@
 package org.qbychat.backend.controller;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
-import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.Config;
-import org.qbychat.backend.entity.RestBean;
-import org.qbychat.backend.entity.VerifyEmail;
+import org.qbychat.backend.entity.*;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.utils.ConfigUtils;
 import org.qbychat.backend.utils.EmailUtils;
+import org.qbychat.backend.utils.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -30,6 +33,12 @@ public class UserController {
 
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Resource
+    private JwtUtils jwtUtils;
+    @Qualifier("jwtDecoder")
+    @Autowired
+    private JwtDecoder jwtDecoder;
 
     @GetMapping("/whoami")
     public RestBean<String> whoAmI(HttpServletRequest request) {
@@ -82,6 +91,28 @@ public class UserController {
         } else {
             log.warn("Someone try to register with uuid: {} but it's not exits.", uuid);
             return RestBean.failure(401, "uuid not found!");
+        }
+    }
+
+    @PostMapping("/change-user-role")
+    public RestBean<String> changeUserRole(@RequestHeader("Authorization") Header header, @RequestParam String username, @RequestParam String role) {
+        String token = header.getValues().get(0);
+        if (jwtUtils.invalidateJwt(token)) {
+            DecodedJWT decodedJWT = (DecodedJWT) jwtDecoder.decode(token);
+            Account postAccount = accountService.findAccountByNameOrEmail(jwtUtils.toUser(decodedJWT).getUsername());
+            if (Objects.equals(postAccount.getRole(), Roles.ADMIN)) {
+                Account changeAccount = accountService.findAccountByNameOrEmail(username);
+                if (changeAccount != null) {
+                    accountService.changeAccountRole(changeAccount, role);
+                    return RestBean.success("Change successful!");
+                } else {
+                    return RestBean.failure(401, "Change user not found!");
+                }
+            } else {
+                return RestBean.failure(401, "You aren't admin!");
+            }
+        } else {
+            return RestBean.forbidden("Your token is invalid!");
         }
     }
 }

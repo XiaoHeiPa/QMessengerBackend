@@ -1,6 +1,7 @@
 package org.qbychat.backend.service.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.mapper.AccountMapper;
@@ -43,5 +44,18 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .where(ACCOUNT.USERNAME.eq(username))
                 .or(ACCOUNT.EMAIL.eq(username));
         return this.mapper.selectOneByQuery(qw);
+    }
+
+    public Account findAccountById(Integer id) {
+        QueryWrapper qw = new QueryWrapper();
+        qw.select(ACCOUNT.ALL_COLUMNS)
+                .where(ACCOUNT.ID.eq(id));
+        return this.mapper.selectOneByQuery(qw);
+    }
+
+    public void changeAccountRole(Account account, String roles) {
+        Account newAccount = UpdateEntity.of(Account.class, account.getId());
+        newAccount.setRole(roles);
+        this.mapper.update(newAccount);
     }
 }

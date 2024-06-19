@@ -54,6 +54,7 @@ dependencies {
     annotationProcessor("com.mybatis-flex:mybatis-flex-processor:1.9.2")
     implementation("com.mybatis-flex:mybatis-flex-codegen:1.8.3")
     implementation("com.zaxxer:HikariCP:4.0.3")
+    implementation("com.eatthepath:java-otp:0.4.0")
 }
 
 tasks.withType<Test> {
