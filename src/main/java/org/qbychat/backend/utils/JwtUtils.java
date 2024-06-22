@@ -32,6 +32,9 @@ public class JwtUtils {
     @Resource
     StringRedisTemplate template;
 
+    /**
+     * 拉黑JWT
+     * */
     public boolean invalidateJwt(String headerToken) {
         String token = convertToken(headerToken);
         if (token == null) return false;
@@ -69,6 +72,9 @@ public class JwtUtils {
         return false;
     }
 
+    /**
+     * 解析JWT
+     * */
     public DecodedJWT resolveJwt(String headerToken) {
         String token = this.convertToken(headerToken);
         if (token == null) {

@@ -1,6 +1,6 @@
 package org.qbychat.backend.config;
 
-import org.qbychat.backend.QMessengerHandler;
+import org.qbychat.backend.ws.QMessengerHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
