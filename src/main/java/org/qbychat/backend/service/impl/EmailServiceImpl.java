@@ -5,6 +5,7 @@ import jakarta.annotation.Resource;
 import org.qbychat.backend.entity.Email;
 import org.qbychat.backend.mapper.EmailMapper;
 import org.qbychat.backend.service.EmailService;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
+@ComponentScan
 public class EmailServiceImpl extends ServiceImpl<EmailMapper, Email> implements EmailService {
     protected final String from = "qby";
 
