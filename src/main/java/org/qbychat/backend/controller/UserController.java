@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.qbychat.backend.entity.*;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
-import org.qbychat.backend.utils.EmailUtils;
+import org.qbychat.backend.service.EmailService;
 import org.qbychat.backend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,7 +38,7 @@ public class UserController {
     @Resource
     private JwtUtils jwtUtils;
 //    @Resource
-    private final EmailUtils emailUtils = new EmailUtils();
+    private final EmailService emailService = new EmailService();
 
     @Value("${messenger.verify.email-verify-url}")
     String verifyUrl;
@@ -73,7 +73,7 @@ public class UserController {
         verifyEmail.setTo(email);
         verifyEmail.setSubject("QbyChat Verify Email");
         verifyEmail.setContent("This is a verify Email. Please click the verify url to continue registration: " + verifyUrl + newAccountUuid);
-        String emailReturn = emailUtils.sendVerifyEmail(verifyEmail);
+        String emailReturn = emailService.sendVerifyEmail(verifyEmail);
         if (Objects.equals(emailReturn, "Succeed!")) {
             log.info("New account try to register with email: {} UUID: {}", newAccount.getEmail(), newAccountUuid);
             return RestBean.success("请从您的邮箱中获取验证链接！");

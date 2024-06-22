@@ -10,20 +10,7 @@ spring:
     username: proc
     password: qbychatproc114514%
     driver-class-name: com.mysql.cj.jdbc.Driver
-  mail:
-    host: smtp-mail.outlook.com
-    protocol: smtp
-    default-encoding: UTF-8
-    username: zxysb1145@outlook.com
-    password: qwer1145
-    test-connection: true
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
+  # Mail config moved to MailConfig.java
 messenger:
   verify:
     email-verify-url: http://localhost:8080/user/apply-register?uuid=
