@@ -1,4 +1,4 @@
-package org.qbychat.backend;
+package org.qbychat.backend.ws;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
@@ -31,7 +31,15 @@ public class QMessengerHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        session.sendMessage(new TextMessage(RestBean.success().toJson()));
+        List<String> authorization = session.getHandshakeHeaders().get("Authorization");
+        DecodedJWT jwt = jwtUtils.resolveJwt(Objects.requireNonNull(authorization).get(0));
+        if (jwt != null) {
+            Account account = accountService.findAccountByNameOrEmail(jwtUtils.toUser(jwt).getUsername());
+            session.sendMessage(new TextMessage(RestBean.success(account).toJson()));
+            return;
+        }
+        session.sendMessage(new TextMessage(RestBean.forbidden("Valid token").toJson()));
+        session.close();
     }
 
     @Override
@@ -39,21 +47,5 @@ public class QMessengerHandler extends TextWebSocketHandler {
 
         super.handleTextMessage(session, message);
         log.info(message.getPayload());
-    }
-
-    @Override
-    protected void handlePongMessage(@NotNull WebSocketSession session, @NotNull PongMessage message) throws Exception {
-        super.handlePongMessage(session, message);
-        List<String> authorization = session.getHandshakeHeaders().get("Authorization");
-        if (jwtUtils.invalidateJwt(Objects.requireNonNull(authorization).get(0))) {
-            Account account = accountService.findAccountById(jwtUtils.getId((DecodedJWT) authorization));
-            List<String> sessionSecret = session.getHandshakeHeaders().get("Secret");
-            if (sessionSecret != null) {
-                String secret = sessionSecret.toString();
-                redisTemplate.opsForValue().set(account.getUsername(), secret);
-            } else {
-                session.sendMessage(new TextMessage("Your http headers don't have secret. Please get info from our api doc."));
-            }
-        }
     }
 }
