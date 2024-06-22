@@ -2,6 +2,9 @@ package org.qbychat.backend.entity.table;
 
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 import java.io.Serial;
 
@@ -11,8 +14,10 @@ import java.io.Serial;
  * @author zszf
  * @since 2024-06-15
  */
+@Component
 public class AccountTableDef extends TableDef {
-    public static final AccountTableDef ACCOUNT = new AccountTableDef();
+    private static AccountTableDef inst;
+
     @Serial
     private static final long serialVersionUID = 1L;
     public final QueryColumn ID = new QueryColumn(this, "id");
@@ -58,4 +63,10 @@ public class AccountTableDef extends TableDef {
         return getCache(key, k -> new AccountTableDef("", "db_account", alias));
     }
 
+    public static AccountTableDef getInstance() {
+        if (inst == null) {
+            inst = new AccountTableDef();
+        }
+        return inst;
+    }
 }

@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 实体类。
@@ -31,6 +32,6 @@ public class Account implements BaseData {
     private String email;
     private String role;
     @Column(value = "registerTime")
-    private LocalDateTime registerTime;
+    private Date registerTime;
     private String nickname;
 }

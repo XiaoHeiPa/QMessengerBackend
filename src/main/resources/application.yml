@@ -24,3 +24,6 @@ spring:
           starttls:
             enable: true
             required: true
+messenger:
+  verify:
+    email-verify-url: http://localhost:8080/user/apply-register?uuid=

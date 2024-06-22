@@ -6,10 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Component;
+
 
 public class EmailUtils {
     @Resource
-    private JavaMailSender mailSender;
+    private JavaMailSenderImpl mailSender;
 
     @Value("${spring.email.username}")
     private String from;

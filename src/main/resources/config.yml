@@ -1,2 +1,0 @@
-verify:
-  email-verify-url: http://localhost:2333/user/apply-register?uuid=
