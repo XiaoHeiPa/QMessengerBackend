@@ -11,11 +11,11 @@ spring:
     password: qbychatproc114514%
     driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
-    host: smtp.163.com
+    host: smtp-mail.outlook.com
     protocol: smtp
     default-encoding: UTF-8
-    username: denys2010@163.com
-    password: xxxxxx
+    username: zxysb1145@outlook.com
+    password: qwer1145
     test-connection: true
     properties:
       mail:
