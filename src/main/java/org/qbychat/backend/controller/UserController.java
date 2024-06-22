@@ -4,9 +4,12 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
-import org.qbychat.backend.entity.*;
+import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.Email;
+import org.qbychat.backend.entity.RestBean;
+import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
-import org.qbychat.backend.service.EmailService;
+import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +20,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,7 +40,7 @@ public class UserController {
     @Resource
     private JwtUtils jwtUtils;
 //    @Resource
-    private final EmailService emailService = new EmailService();
+private final EmailServiceImpl emailService = new EmailServiceImpl();
 
     @Value("${messenger.verify.email-verify-url}")
     String verifyUrl;
@@ -53,7 +55,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) throws IOException {
+    public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) {
         if (accountService.findAccountByNameOrEmail(name) != null) {
             return RestBean.failure(401, "User exist.");
         }
@@ -69,7 +71,7 @@ public class UserController {
         newAccount.setRegisterTime(new Date());
         UUID newAccountUuid = UUID.randomUUID();
         redisTemplate.opsForValue().set(String.valueOf(newAccountUuid), newAccount);
-        VerifyEmail verifyEmail = new VerifyEmail();
+        Email verifyEmail = new Email();
         verifyEmail.setTo(email);
         verifyEmail.setSubject("QbyChat Verify Email");
         verifyEmail.setContent("This is a verify Email. Please click the verify url to continue registration: " + verifyUrl + newAccountUuid);

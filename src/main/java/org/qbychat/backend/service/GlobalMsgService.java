@@ -12,4 +12,8 @@ import org.qbychat.backend.entity.GlobalMsg;
 public interface GlobalMsgService extends IService<GlobalMsg> {
     GlobalMsg findGlobalMsgById(String id);
     GlobalMsg findGlobalMsgBySender(String sender);
+
+    void createGlobalMsg(GlobalMsg globalMsg);
+
+    void getNextId();
 }

@@ -33,4 +33,14 @@ public class GlobalMsgServiceImpl extends ServiceImpl<GlobalMsgMapper, GlobalMsg
                 .where(GLOBAL_MSG.SENDER.eq(sender));
         return this.mapper.selectOneByQuery(qw);
     }
+
+    @Override
+    public void createGlobalMsg(GlobalMsg globalMsg) {
+        this.mapper.insertSelective(globalMsg);
+    }
+
+    @Override
+    public void getNextId() {
+
+    }
 }
