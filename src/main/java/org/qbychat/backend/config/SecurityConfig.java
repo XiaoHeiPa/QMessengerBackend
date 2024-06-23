@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 .requestMatchers("/user/register").anonymous()
                                 .requestMatchers("/user/apply-register").anonymous()
                                 .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/find-device/**").authenticated()
                                 .requestMatchers("/admin").hasRole(Roles.ADMIN)
                                 .anyRequest().permitAll()
                 )

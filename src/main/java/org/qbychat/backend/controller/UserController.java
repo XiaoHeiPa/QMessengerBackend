@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.qbychat.backend.utils.Const.ACCOUNT_VERIFY;
+
 @RestController
 @RequestMapping("/user")
 @Log4j2
@@ -70,7 +72,7 @@ private final EmailServiceImpl emailService = new EmailServiceImpl();
         newAccount.setNickname(name);
         newAccount.setRegisterTime(new Date());
         UUID newAccountUuid = UUID.randomUUID();
-        redisTemplate.opsForValue().set(String.valueOf(newAccountUuid), newAccount);
+        redisTemplate.opsForValue().set(ACCOUNT_VERIFY + newAccountUuid, newAccount);
         Email verifyEmail = new Email();
         verifyEmail.setTo(email);
         verifyEmail.setSubject("QbyChat Verify Email");
