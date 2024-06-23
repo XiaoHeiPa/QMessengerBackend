@@ -33,7 +33,7 @@ public class FindDeviceController {
     @GetMapping("query")
     public RestBean<Location> query(HttpServletRequest request, @RequestParam String meid) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        if (!hasOwnedDevice(account, meid)) {
+        if (isOwnedDevice(account, meid)) {
             return RestBean.forbidden("Not your device");
         }
         Location location = handler.findLocationByMeid(meid);
@@ -46,14 +46,14 @@ public class FindDeviceController {
     @GetMapping("force-query")
     public RestBean<String> force(HttpServletRequest request, @RequestParam String meid) throws Exception{
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        if (!hasOwnedDevice(account, meid)) {
+        if (isOwnedDevice(account, meid)) {
             return RestBean.forbidden("Not your device");
         }
         handler.sendLocateRequest(meid);
         return RestBean.success("Request has sent");
     }
 
-    protected boolean hasOwnedDevice(Account account, String meid) {
-        return handler.findDeviceMeidsByAccount(account).contains(meid);
+    protected boolean isOwnedDevice(Account account, String meid) {
+        return !handler.findDeviceMeidsByAccount(account).contains(meid);
     }
 }
