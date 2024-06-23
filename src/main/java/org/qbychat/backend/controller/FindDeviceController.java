@@ -8,6 +8,7 @@ import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.ws.FindDeviceHandler;
 import org.qbychat.backend.ws.entity.Location;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,9 +35,12 @@ public class FindDeviceController {
     public RestBean<Location> query(HttpServletRequest request, @RequestParam String meid) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         if (isOwnedDevice(account, meid)) {
-            return RestBean.forbidden("Not your device");
+            return RestBean.forbidden("Not your device (otherwise the device was offline)");
         }
         Location location = handler.findLocationByMeid(meid);
+        if (location == null) {
+            return RestBean.failure(444, "Invalid Find Device client, are you using PostMan?");
+        }
         return RestBean.success(location);
     }
 
@@ -47,7 +51,7 @@ public class FindDeviceController {
     public RestBean<String> force(HttpServletRequest request, @RequestParam String meid) throws Exception{
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         if (isOwnedDevice(account, meid)) {
-            return RestBean.forbidden("Not your device");
+            return RestBean.forbidden("Not your device (otherwise the device was offline)");
         }
         handler.sendLocateRequest(meid);
         return RestBean.success("Request has sent");
