@@ -11,7 +11,7 @@ public class Response {
     public static Response LOCATE = new Response("locate", null);
 
     String method;
-    JSONObject data;
+    Object data;
 
     public String toJson()  {
         return JSONObject.toJSONString(this, JSONWriter.Feature.WriteNulls);

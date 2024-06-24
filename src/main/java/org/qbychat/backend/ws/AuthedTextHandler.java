@@ -8,6 +8,7 @@ import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -46,7 +47,10 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
 
     protected Account getUser(@NotNull WebSocketSession session) {
         List<String> authorization = session.getHandshakeHeaders().get("Authorization");
-        DecodedJWT jwt = jwtUtils.resolveJwt(Objects.requireNonNull(authorization).get(0));
+        if (authorization == null) {
+            return null;
+        }
+        DecodedJWT jwt = jwtUtils.resolveJwt(authorization.get(0));
         if (jwt != null) {
             return accountService.findAccountByNameOrEmail(jwtUtils.toUser(jwt).getUsername());
         }
