@@ -7,23 +7,31 @@ import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.service.AccountService;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
+import org.qbychat.backend.utils.Const;
 import org.qbychat.backend.ws.entity.ChatMessage;
 import org.qbychat.backend.ws.entity.Request;
 import org.qbychat.backend.ws.entity.RequestType;
 import org.qbychat.backend.ws.entity.Response;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class QMessengerHandler extends AuthedTextHandler {
     @Resource
     AccountServiceImpl accountService;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
@@ -31,7 +39,17 @@ public class QMessengerHandler extends AuthedTextHandler {
     public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
         if (session.isOpen()) {
-            connections.put(getUser(session).getId(), session);
+            Account account = getUser(session);
+            connections.put(account.getId(), session);
+            // 发送离线时收到的消息
+            Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + account.getId());
+            if (cache0 != null) {
+                List<ChatMessage> caches = (List<ChatMessage>) cache0;
+                for (ChatMessage chatMessage : caches) {
+                    Response msgResponse = new Response("chat-message", chatMessage);
+                    session.sendMessage(new TextMessage(msgResponse.toJson()));
+                }
+            }
         }
     }
 
@@ -53,11 +71,26 @@ public class QMessengerHandler extends AuthedTextHandler {
             Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
             chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
             Response msgResponse = new Response("chat-message", chatMessage);
+            boolean isTargetOnline = false;
             for (Integer id : connections.keySet()) {
                 WebSocketSession s = connections.get(id);
                 if (id.equals(to.getId())) {
                     s.sendMessage(new TextMessage(msgResponse.toJson()));
+                    isTargetOnline = true;
                 }
+            }
+            if (!isTargetOnline) {
+                // 先将消息缓存
+                Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + to.getId());
+                List<ChatMessage> caches;
+                if (cache0 == null) {
+                    caches = new ArrayList<>();
+                } else {
+                    caches = (List<ChatMessage>) cache0; // wtf unchecked cast
+                }
+                caches.add(chatMessage);
+                // 只缓存<timeout>天
+                redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + to.getId(), caches, 7, TimeUnit.DAYS);
             }
         }
     }
