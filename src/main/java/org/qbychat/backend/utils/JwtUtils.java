@@ -8,6 +8,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import jakarta.annotation.Resource;
 import org.jetbrains.annotations.NotNull;
+import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,6 +33,9 @@ public class JwtUtils {
 
     @Resource
     StringRedisTemplate template;
+
+    @Resource
+    AccountServiceImpl accountService;
 
     /**
      * 拉黑JWT
@@ -93,6 +98,17 @@ public class JwtUtils {
         } catch (JWTVerificationException error) {
             // User modified this
             return null;
+        }
+    }
+
+    public String getUsernameFromJwtToken(String token) {
+        DecodedJWT decodedJWT = resolveJwt(token);
+        UserDetails userDetails = toUser(decodedJWT);
+        Account account = accountService.findAccountByNameOrEmail(userDetails.getUsername());
+        if (account == null) {
+            return null;
+        } else {
+            return account.getUsername();
         }
     }
 
