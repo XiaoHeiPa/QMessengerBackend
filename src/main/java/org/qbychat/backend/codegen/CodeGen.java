@@ -19,7 +19,7 @@ public class CodeGen {
         globalConfig.setEntityWithLombok(true);
         globalConfig.setEntityGenerateEnable(true);
         globalConfig.setAuthor("zszf");
-        globalConfig.setGenerateTable("db_global_msg");
+        globalConfig.setGenerateTable("db_friends");
         globalConfig.setTablePrefix("db_");
         globalConfig.setTableDefGenerateEnable(true);
         Generator generator = new Generator(ds, globalConfig);
