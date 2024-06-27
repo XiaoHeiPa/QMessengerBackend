@@ -61,9 +61,31 @@ public class FriendsServiceImpl extends ServiceImpl<FriendsMapper, Friend> imple
         return !friends1.isEmpty() || !friends2.isEmpty();
     }
 
-    public void removeFriend(Account a, Account b) {
+    /**
+     * 删除好友
+     *
+     * @return 是否删除成功
+     */
+    public boolean removeFriend(Account a, Account b) {
+        if (!hasFriend(a, b)) {
+            return false;
+        }
+
         QueryWrapper qw = new QueryWrapper();
-        qw.where(FRIENDS.USER1.eq(a)).and(FRIENDS.USER2.eq(b));
-        this.mapper.deleteByQuery(qw);
+        qw
+                .where(FRIENDS.USER1.eq(a))
+                .and(FRIENDS.USER2.eq(b));
+        if (!this.mapper.selectListByQuery(qw).isEmpty()) {
+            this.mapper.deleteByQuery(qw);
+        }
+
+        QueryWrapper qw1 = new QueryWrapper();
+        qw1
+                .where(FRIENDS.USER2.eq(a))
+                .and(FRIENDS.USER1.eq(b));
+        if (!this.mapper.selectListByQuery(qw1).isEmpty()) {
+            this.mapper.deleteByQuery(qw1);
+        }
+        return true;
     }
 }

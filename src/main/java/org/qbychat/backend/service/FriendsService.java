@@ -12,6 +12,6 @@ import org.qbychat.backend.entity.Friend;
  */
 public interface FriendsService extends IService<Friend> {
     Account[] getFriendsWithAccount(Account account); // 获取此Account下的所有好友
-    void addFriend(Account a, Account b); // 单向好友， 如需双向请运行两次此函数并将实参颠倒。
-    void removeFriend(Account a, Account b); // a删除b 但b不删除a
+    void addFriend(Account a, Account b);
+    boolean removeFriend(Account a, Account b); // a删除b 但b不删除a
 }
