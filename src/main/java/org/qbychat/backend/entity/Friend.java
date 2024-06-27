@@ -22,7 +22,7 @@ import java.io.Serial;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "db_friends")
-public class Friends implements Serializable {
+public class Friend implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -30,12 +30,7 @@ public class Friends implements Serializable {
     @Id(keyType = KeyType.Auto)
     private Integer id;
 
-    private String from;
-
-    private Integer fromId;
-
-    private String to;
-
-    private Integer toId;
+    private Integer user1;
+    private Integer user2;
 
 }

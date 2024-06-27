@@ -1,4 +1,4 @@
-package org.qbychat.backend.components;
+package org.qbychat.backend.ws;
 
 import jakarta.annotation.Resource;
 import org.qbychat.backend.utils.JwtUtils;

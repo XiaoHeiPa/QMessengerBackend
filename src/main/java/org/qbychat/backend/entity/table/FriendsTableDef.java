@@ -23,18 +23,11 @@ public class FriendsTableDef extends TableDef {
 
     
     public final QueryColumn ID = new QueryColumn(this, "id");
+    
+    public final QueryColumn USER1 = new QueryColumn(this, "user1");
 
     
-    public final QueryColumn TO = new QueryColumn(this, "to");
-
-    
-    public final QueryColumn FROM = new QueryColumn(this, "from");
-
-    
-    public final QueryColumn TO_ID = new QueryColumn(this, "to_id");
-
-    
-    public final QueryColumn FROM_ID = new QueryColumn(this, "from_id");
+    public final QueryColumn USER2 = new QueryColumn(this, "user2");
 
     /**
      * 所有字段。
@@ -44,7 +37,7 @@ public class FriendsTableDef extends TableDef {
     /**
      * 默认字段，不包含逻辑删除或者 large 等字段。
      */
-    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, FROM, FROM_ID, TO, TO_ID};
+    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, USER2, USER1};
 
     public FriendsTableDef() {
         super("", "db_friends");
@@ -58,5 +51,4 @@ public class FriendsTableDef extends TableDef {
         String key = getNameWithSchema() + "." + alias;
         return getCache(key, k -> new FriendsTableDef("", "db_friends", alias));
     }
-
 }

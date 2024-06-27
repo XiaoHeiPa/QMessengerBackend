@@ -7,11 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.service.AccountService;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
+import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.utils.Const;
-import org.qbychat.backend.ws.entity.ChatMessage;
-import org.qbychat.backend.ws.entity.Request;
-import org.qbychat.backend.ws.entity.RequestType;
-import org.qbychat.backend.ws.entity.Response;
+import org.qbychat.backend.ws.entity.*;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -27,6 +25,9 @@ import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class QMessengerHandler extends AuthedTextHandler {
+    @Resource
+    FriendsServiceImpl friendsService;
+
     @Resource
     AccountServiceImpl accountService;
 
@@ -46,7 +47,7 @@ public class QMessengerHandler extends AuthedTextHandler {
             if (cache0 != null) {
                 List<ChatMessage> caches = (List<ChatMessage>) cache0;
                 for (ChatMessage chatMessage : caches) {
-                    Response msgResponse = new Response("chat-message", chatMessage);
+                    Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
                     session.sendMessage(new TextMessage(msgResponse.toJson()));
                 }
             }
@@ -61,8 +62,8 @@ public class QMessengerHandler extends AuthedTextHandler {
         String method = request.getMethod();
         Account account = getUser(session);
 
-        ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
         if (method.equals(RequestType.SEND_MESSAGE)) {
+            ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
             log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
             // send message
             // todo 实现群组, 离线消息, fcm
@@ -70,7 +71,7 @@ public class QMessengerHandler extends AuthedTextHandler {
             // 找到目标并发送
             Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
             chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
-            Response msgResponse = new Response("chat-message", chatMessage);
+            Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
             boolean isTargetOnline = false;
             for (Integer id : connections.keySet()) {
                 WebSocketSession s = connections.get(id);
@@ -92,6 +93,20 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // 只缓存<timeout>天
                 redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + to.getId(), caches, 7, TimeUnit.DAYS);
             }
+        }
+        else if (method.equals(RequestType.ADD_FRIEND)) {
+            AddFriendRequest friendRequest = JSON.parseObject(request.getDataJson(), AddFriendRequest.class);
+            Integer target = friendRequest.getTarget();
+            friendRequest.setFrom(account.getId());
+            if (friendsService.hasFriend(account, accountService.findAccountById(target))) {
+                session.sendMessage(new TextMessage(Response.HAS_FRIEND.toJson()));
+                return;
+            }
+            // 发送请求
+            session.sendMessage(new TextMessage(Response.FRIEND_REQUEST_SENT.toJson()));
+            // find target session
+            WebSocketSession targetWebsocket = connections.get(target);
+            targetWebsocket.sendMessage(new TextMessage(Response.FRIEND_REQUEST.setData(friendRequest).toJson()));
         }
     }
 

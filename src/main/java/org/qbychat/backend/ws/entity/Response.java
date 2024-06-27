@@ -6,14 +6,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @AllArgsConstructor
-@Data
-public class Response {
-    public static Response LOCATE = new Response("locate", null);
+public enum Response {
+    LOCATE("locate", null),
+    HAS_FRIEND("has-friend", null),
+    FRIEND_REQUEST("friend-request", null),
+    FRIEND_REQUEST_SENT("friend-request-sent", null),
+    CHAT_MESSAGE("chat-message", null);
 
-    String method;
+    public final String method;
     Object data;
 
-    public String toJson()  {
+    public String toJson() {
         return JSONObject.toJSONString(this, JSONWriter.Feature.WriteNulls);
+    }
+
+    public Response setData(Object data) {
+        this.data = data;
+        return this;
+    }
+
+    public class FRIEND_REQUEST {
     }
 }

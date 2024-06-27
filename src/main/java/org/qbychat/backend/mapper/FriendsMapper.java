@@ -2,7 +2,7 @@ package org.qbychat.backend.mapper;
 
 import com.mybatisflex.core.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.qbychat.backend.entity.Friends;
+import org.qbychat.backend.entity.Friend;
 
 /**
  *  映射层。
@@ -11,6 +11,6 @@ import org.qbychat.backend.entity.Friends;
  * @since 2024-06-26
  */
 @Mapper
-public interface FriendsMapper extends BaseMapper<Friends> {
+public interface FriendsMapper extends BaseMapper<Friend> {
 
 }
