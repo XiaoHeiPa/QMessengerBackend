@@ -78,7 +78,7 @@ public class QMessengerHandler extends AuthedTextHandler {
         switch (method) {
             case RequestType.SEND_MESSAGE -> {
                 ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
-                log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
+//                log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
                 // send message
                 // todo fcm
                 // 找到目标并发送
