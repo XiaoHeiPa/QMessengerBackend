@@ -54,12 +54,17 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     public void updateRole(Account account, Roles role) {
         Account newAccount = UpdateEntity.of(Account.class, account.getId());
         newAccount.setRole(role.name());
-        this.mapper.update(newAccount);
+        this.updateUser(newAccount);
     }
 
     public void updatePassword(Account account, String password) {
         Account newAccount = UpdateEntity.of(Account.class, account.getId());
         newAccount.setPassword(password);
-        this.mapper.update(newAccount);
+        this.updateUser(newAccount);
+    }
+
+    @Override
+    public void updateUser(Account account) {
+        this.mapper.update(account);
     }
 }

@@ -31,10 +31,14 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
-        Account user = getUser(session);
-        if (user != null) {
-            Account account = accountService.findAccountByNameOrEmail(user.getUsername());
-            log.info("User " + account.getId() + " has connected to " + this.getClass().getName());
+        Account account = getUser(session);
+        if (account != null) {
+            if (!account.isActive()) {
+                session.sendMessage(new TextMessage(RestBean.failure(403, "You're now banned, so you cannot connect to the ws server.").toJson()));
+                session.close();
+                return;
+            }
+            log.info("User {} has connected to {}", account.getId(), this.getClass().getName());
             session.sendMessage(new TextMessage(RestBean.success(account).toJson()));
         } else {
             session.sendMessage(new TextMessage(RestBean.forbidden("Valid token").toJson()));

@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -34,4 +33,6 @@ public class Account implements BaseData {
     @Column(value = "registerTime")
     private Date registerTime;
     private String nickname;
+    @Column(value = "state")
+    private boolean active = true;
 }

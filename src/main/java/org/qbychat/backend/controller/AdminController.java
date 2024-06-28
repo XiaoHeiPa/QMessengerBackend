@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Log4j2
 @RestController
@@ -46,11 +47,7 @@ public class AdminController {
         account.setPassword(passwordEncoder.encode(password));
         account.setEmail(email);
         account.setRegisterTime(new Date());
-        if (role != null) {
-            account.setRole(role.name());
-        } else {
-            account.setRole(Roles.USER.name());
-        }
+        account.setRole(Objects.requireNonNullElse(role, Roles.USER).name());
         if (nickname != null) {
             account.setNickname(nickname);
         } else {
@@ -61,5 +58,27 @@ public class AdminController {
             return RestBean.success();
         }
         return RestBean.failure(500, "Unable to save account. (SQL)");
+    }
+
+    @PostMapping("/ban")
+    public RestBean<String> ban(@RequestParam("username") String username, HttpServletRequest request) {
+        Account account = accountService.findAccountByNameOrEmail(username);
+        if (!account.isActive()) {
+            return RestBean.failure(409, "Account is already disabled.");
+        }
+        account.setActive(false);
+        accountService.updateUser(account);
+        return RestBean.success("User " + username + " has been banned.");
+    }
+
+    @PostMapping("pardon")
+    public RestBean<String> pardon(@RequestParam("username") String username, HttpServletRequest request) {
+        Account account = accountService.findAccountByNameOrEmail(username);
+        if (account.isActive()) {
+            return RestBean.failure(409, "Account is already active.");
+        }
+        account.setActive(true);
+        accountService.updateUser(account);
+        return RestBean.success("User " + username + " has been pardoned.");
     }
 }
