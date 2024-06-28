@@ -9,8 +9,10 @@ import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Email;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.Roles;
+import org.qbychat.backend.service.FriendsService;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
+import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,9 +22,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static org.qbychat.backend.utils.Const.ACCOUNT_VERIFY;
 
@@ -38,6 +38,8 @@ public class UserController {
 
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
+    @Resource
+    private FriendsServiceImpl friendsService;
 
     @Resource
     private JwtUtils jwtUtils;
@@ -115,4 +117,20 @@ public class UserController {
         }
         return RestBean.failure(500, "Password changed, but failed to logout.");
     }
+
+    @GetMapping("/friends/list")
+    public RestBean<List<String>> getFriends(@NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        Account[] friends = friendsService.getFriendsWithAccount(user);
+        List<String> friendUserNames = new ArrayList<>();
+        for (Account friend : friends) {
+            friendUserNames.add(friend.getUsername());
+        }
+        return RestBean.success(friendUserNames);
+    }
+
+//    @PostMapping("/friends/add")
+//    public RestBean<String> addFriend(@RequestParam("username") String username, HttpServletRequest request) {
+//
+//    }
 }
