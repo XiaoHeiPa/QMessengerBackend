@@ -107,6 +107,9 @@ public class QMessengerHandler extends AuthedTextHandler {
             // find target session
             WebSocketSession targetWebsocket = connections.get(target);
             targetWebsocket.sendMessage(new TextMessage(Response.FRIEND_REQUEST.setData(friendRequest).toJson()));
+        } else if (method.equals(RequestType.ACCEPT_FRIEND_REQUEST)) {
+            Integer target = JSON.parseObject(request.getDataJson(), Integer.class);
+            log.info(target);
         }
     }
 

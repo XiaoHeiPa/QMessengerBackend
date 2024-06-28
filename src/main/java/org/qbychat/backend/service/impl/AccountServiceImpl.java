@@ -3,6 +3,7 @@ package org.qbychat.backend.service.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.table.AccountTableDef;
 import org.qbychat.backend.mapper.AccountMapper;
@@ -10,6 +11,7 @@ import org.qbychat.backend.service.AccountService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = findAccountByNameOrEmail(username);
@@ -52,9 +53,15 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         return this.mapper.selectOneByQuery(qw);
     }
 
-    public void changeAccountRole(Account account, String roles) {
+    public void updateRole(Account account, String roles) {
         Account newAccount = UpdateEntity.of(Account.class, account.getId());
         newAccount.setRole(roles);
+        this.mapper.update(newAccount);
+    }
+
+    public void updatePassword(Account account, String password) {
+        Account newAccount = UpdateEntity.of(Account.class, account.getId());
+        newAccount.setPassword(password);
         this.mapper.update(newAccount);
     }
 }

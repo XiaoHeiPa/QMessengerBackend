@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Email;
 import org.qbychat.backend.entity.RestBean;
@@ -11,7 +12,6 @@ import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,8 +47,8 @@ private final EmailServiceImpl emailService = new EmailServiceImpl();
     @Value("${messenger.verify.email-verify-url}")
     String verifyUrl;
 
+    @Resource
     @Qualifier("jwtDecoder")
-    @Autowired
     private JwtDecoder jwtDecoder;
 
     @GetMapping("/whoami")
@@ -102,25 +102,10 @@ private final EmailServiceImpl emailService = new EmailServiceImpl();
         }
     }
 
-    @PostMapping("/change-user-role")
-    public RestBean<String> changeUserRole(@RequestHeader("Authorization") Header header, @RequestParam String username, @RequestParam String role) {
-        String token = header.getValues().get(0);
-        if (jwtUtils.invalidateJwt(token)) {
-            DecodedJWT decodedJWT = (DecodedJWT) jwtDecoder.decode(token);
-            Account postAccount = accountService.findAccountByNameOrEmail(jwtUtils.toUser(decodedJWT).getUsername());
-            if (Objects.equals(postAccount.getRole(), Roles.ADMIN)) {
-                Account changeAccount = accountService.findAccountByNameOrEmail(username);
-                if (changeAccount != null) {
-                    accountService.changeAccountRole(changeAccount, role);
-                    return RestBean.success("Change successful!");
-                } else {
-                    return RestBean.failure(401, "Change user not found!");
-                }
-            } else {
-                return RestBean.failure(401, "You aren't admin!");
-            }
-        } else {
-            return RestBean.forbidden("Your token is invalid!");
-        }
+    @PostMapping("/update-password")
+    public RestBean<String> changePassword(@RequestParam("password") String password, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        accountService.updatePassword(user, passwordEncoder.encode(password));
+        return RestBean.success("Password changed.");
     }
 }

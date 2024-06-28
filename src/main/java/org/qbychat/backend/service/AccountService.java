@@ -16,5 +16,5 @@ public interface AccountService extends IService<Account>, UserDetailsService {
 
     Account findAccountById(Integer id);
 
-    void changeAccountRole(Account account, String roles);
+    void updateRole(Account account, String roles);
 }
