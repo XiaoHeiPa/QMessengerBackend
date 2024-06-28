@@ -37,19 +37,15 @@ public class QMessengerHandler extends AuthedTextHandler {
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
     @Override
-    public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
-        super.afterConnectionEstablished(session);
-        if (session.isOpen()) {
-            Account account = getUser(session);
-            connections.put(account.getId(), session);
-            // 发送离线时收到的消息
-            Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + account.getId());
-            if (cache0 != null) {
-                List<ChatMessage> caches = (List<ChatMessage>) cache0;
-                for (ChatMessage chatMessage : caches) {
-                    Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
-                    session.sendMessage(new TextMessage(msgResponse.toJson()));
-                }
+    protected void afterAuthed(@NotNull WebSocketSession session, Account account) throws Exception {
+        connections.put(account.getId(), session);
+        // 发送离线时收到的消息
+        Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + account.getId());
+        if (cache0 != null) {
+            List<ChatMessage> caches = (List<ChatMessage>) cache0;
+            for (ChatMessage chatMessage : caches) {
+                Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
+                session.sendMessage(new TextMessage(msgResponse.toJson()));
             }
         }
     }
@@ -93,8 +89,7 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // 只缓存<timeout>天
                 redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + to.getId(), caches, 7, TimeUnit.DAYS);
             }
-        }
-        else if (method.equals(RequestType.ADD_FRIEND)) {
+        } else if (method.equals(RequestType.ADD_FRIEND)) {
             AddFriendRequest friendRequest = JSON.parseObject(request.getDataJson(), AddFriendRequest.class);
             Integer target = friendRequest.getTarget();
             friendRequest.setFrom(account.getId());

@@ -43,11 +43,12 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
         } else {
             session.sendMessage(new TextMessage(RestBean.forbidden("Valid token").toJson()));
             session.close();
+            return;
         }
-        // 接下来
-        // 通过 session.isOpen() 来判断是否验证成功
-        // (通常不需要写)
+        afterAuthed(session, account);
     }
+
+    protected void afterAuthed(@NotNull WebSocketSession session, Account account) throws Exception {}
 
     protected Account getUser(@NotNull WebSocketSession session) {
         List<String> authorization = session.getHandshakeHeaders().get("Authorization");

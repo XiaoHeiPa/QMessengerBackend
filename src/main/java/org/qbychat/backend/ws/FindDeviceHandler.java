@@ -40,21 +40,18 @@ public class FindDeviceHandler extends AuthedTextHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
-        super.afterConnectionEstablished(session);
-        if (session.isOpen()) {
-            List<String> list = session.getHandshakeHeaders().get("meid");
-            if (list == null) {
-                session.close(); // stop connecting with PostMan, lol
-                return;
-            }
-            String meid = list.get(0);
-            if (connections.containsKey(meid)) {
-                connections.get(meid).close(); // 关闭旧连接
-                // todo 这样做似乎是不安全的, 但是没有更好的解决方案.
-            }
-            connections.put(meid, session);
+    protected void afterAuthed(@NotNull WebSocketSession session, Account account) throws Exception {
+        List<String> list = session.getHandshakeHeaders().get("meid");
+        if (list == null) {
+            session.close(); // stop connecting with PostMan, lol
+            return;
         }
+        String meid = list.get(0);
+        if (connections.containsKey(meid)) {
+            connections.get(meid).close(); // 关闭旧连接
+            // todo 这样做似乎是不安全的, 但是没有更好的解决方案.
+        }
+        connections.put(meid, session);
     }
 
     @Override
