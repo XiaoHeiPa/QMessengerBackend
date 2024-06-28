@@ -136,6 +136,9 @@ public class QMessengerHandler extends AuthedTextHandler {
     @Override
     public void afterConnectionClosed(@NotNull WebSocketSession session, @NotNull CloseStatus status) throws Exception {
         Account account = getUser(session);
+        if (account == null) {
+            return; // not authed
+        }
         log.info("User {} has disconnected from {}", account.getId(), this.getClass().getName());
         connections.remove(account.getId());
     }
