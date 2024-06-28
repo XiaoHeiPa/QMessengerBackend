@@ -2,6 +2,7 @@ package org.qbychat.backend.service;
 
 import com.mybatisflex.core.service.IService;
 import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.Roles;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -12,9 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  */
 public interface AccountService extends IService<Account>, UserDetailsService {
     Account findAccountByNameOrEmail(String text);
-    void registerAccount(Account account);
-
     Account findAccountById(Integer id);
 
-    void updateRole(Account account, String roles);
+    void updateRole(Account account, Roles roles);
+    void updatePassword(Account account, String password);
 }

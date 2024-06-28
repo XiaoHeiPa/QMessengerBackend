@@ -26,9 +26,9 @@ import java.util.UUID;
 
 import static org.qbychat.backend.utils.Const.ACCOUNT_VERIFY;
 
+@Log4j2
 @RestController
 @RequestMapping("/user")
-@Log4j2
 public class UserController {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -41,8 +41,8 @@ public class UserController {
 
     @Resource
     private JwtUtils jwtUtils;
-//    @Resource
-private final EmailServiceImpl emailService = new EmailServiceImpl();
+    //    @Resource
+    private final EmailServiceImpl emailService = new EmailServiceImpl();
 
     @Value("${messenger.verify.email-verify-url}")
     String verifyUrl;
@@ -65,7 +65,7 @@ private final EmailServiceImpl emailService = new EmailServiceImpl();
             return RestBean.failure(401, "Email exist.");
         }
         Account newAccount = new Account();
-        newAccount.setRole("user");
+        newAccount.setRole(Roles.USER.name());
         newAccount.setUsername(name);
         newAccount.setEmail(email);
         newAccount.setPassword(passwordEncoder.encode(password));
@@ -92,7 +92,10 @@ private final EmailServiceImpl emailService = new EmailServiceImpl();
         UUID userUuid = UUID.fromString(uuid);
         if (Boolean.TRUE.equals(redisTemplate.hasKey(userUuid.toString()))) {
             Account registerAccount = (Account) redisTemplate.opsForValue().getAndDelete(uuid);
-            accountService.registerAccount(registerAccount);
+            if (!accountService.save(registerAccount)) {
+                log.info("An error happened when registering {}", registerAccount);
+                return RestBean.failure(500, "An error happened when registering");
+            }
             assert registerAccount != null;
             log.info("Account {} has been registered.", registerAccount.getUsername());
             return RestBean.success("Register success.");
