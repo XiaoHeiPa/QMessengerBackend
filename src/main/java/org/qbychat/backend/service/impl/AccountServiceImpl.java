@@ -67,4 +67,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     public void updateUser(Account account) {
         this.mapper.update(account);
     }
+
+    @Override
+    public boolean hasUser(String name) {
+        return this.findAccountByNameOrEmail(name) != null;
+    }
 }

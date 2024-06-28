@@ -7,6 +7,7 @@ import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
+import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,8 @@ public class AdminController {
     AccountServiceImpl accountService;
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
+    @Resource
+    GroupsServiceImpl groupsService;
 
     @GetMapping("/ping")
     public String ping() {
@@ -37,10 +40,16 @@ public class AdminController {
         return RestBean.success();
     }
 
+    /**
+     * Force register
+     * */
     @PostMapping("/register")
     public RestBean<String> register(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("email") String email, @RequestParam(value = "nickname", required = false) String nickname, @RequestParam(value = "role", required = false) Roles role, HttpServletRequest request) {
-        if (accountService.findAccountByNameOrEmail(username) != null) {
+        if (accountService.hasUser(username)) {
             return RestBean.failure(409, "Account already exists.");
+        }
+        if (groupsService.hasGroup(username)) {
+            return RestBean.failure(409, "Name" + username + " had taken by a group.");
         }
         Account account = new Account();
         account.setUsername(username);
@@ -65,6 +74,10 @@ public class AdminController {
         Account account = accountService.findAccountByNameOrEmail(username);
         if (!account.isActive()) {
             return RestBean.failure(409, "Account is already disabled.");
+        }
+        Account me = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        if (account.equals(me)) {
+            return RestBean.failure(403, "You cannot ban yourself. Here is not Minecraft.");
         }
         account.setActive(false);
         accountService.updateUser(account);
