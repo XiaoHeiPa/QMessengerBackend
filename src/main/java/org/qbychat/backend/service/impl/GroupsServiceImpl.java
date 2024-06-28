@@ -1,7 +1,5 @@
 package org.qbychat.backend.service.impl;
 
-import com.alibaba.fastjson2.JSONArray;
-import com.mybatisflex.core.handler.BaseJsonTypeHandler;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -12,7 +10,6 @@ import org.qbychat.backend.mapper.GroupMapper;
 import org.qbychat.backend.service.GroupsService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -69,7 +66,20 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
     }
 
     @Override
+    public Group getGroupById(Integer id) {
+        QueryWrapper qw = new QueryWrapper();
+        qw.select(GROUPS.ALL_COLUMNS)
+                .where(GROUPS.ID.eq(id));
+        return this.mapper.selectOneByQuery(qw);
+    }
+
+    @Override
     public boolean hasGroup(String name) {
         return this.getGroupByName(name) != null;
+    }
+
+    @Override
+    public boolean hasGroup(Integer id) {
+        return this.getGroupById(id) != null;
     }
 }

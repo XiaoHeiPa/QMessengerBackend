@@ -72,4 +72,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     public boolean hasUser(String name) {
         return this.findAccountByNameOrEmail(name) != null;
     }
+
+    @Override
+    public boolean hasUser(Integer id) {
+        return this.findAccountById(id) != null;
+    }
 }

@@ -13,5 +13,9 @@ public interface GroupsService extends IService<Group> {
 
     Group getGroupByName(String groupName);
 
+    Group getGroupById(Integer id);
+
     boolean hasGroup(String name);
+
+    boolean hasGroup(Integer id);
 }

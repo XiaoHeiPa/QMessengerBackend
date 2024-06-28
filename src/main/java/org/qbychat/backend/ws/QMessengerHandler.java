@@ -5,9 +5,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.Group;
 import org.qbychat.backend.service.AccountService;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
+import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.utils.Const;
 import org.qbychat.backend.ws.entity.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,6 +32,8 @@ public class QMessengerHandler extends AuthedTextHandler {
 
     @Resource
     AccountServiceImpl accountService;
+    @Resource
+    GroupsServiceImpl groupsService;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -50,6 +54,19 @@ public class QMessengerHandler extends AuthedTextHandler {
         }
     }
 
+    private void cacheMessage(int id, ChatMessage chatMessage) {
+        Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + id);
+        List<ChatMessage> caches;
+        if (cache0 == null) {
+            caches = new ArrayList<>();
+        } else {
+            caches = (List<ChatMessage>) cache0; // wtf unchecked cast
+        }
+        caches.add(chatMessage);
+        // 只缓存<timeout>天
+        redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + id, caches, 7, TimeUnit.DAYS);
+    }
+
 
     @Override
     protected void handleTextMessage(@NotNull WebSocketSession session, @NotNull TextMessage message) throws Exception {
@@ -63,32 +80,36 @@ public class QMessengerHandler extends AuthedTextHandler {
                 ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
                 log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
                 // send message
-                // todo 实现群组, 离线消息, fcm
-
+                // todo fcm
                 // 找到目标并发送
-                Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
                 chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
                 Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
-                boolean isTargetOnline = false;
-                for (Integer id : connections.keySet()) {
-                    WebSocketSession s = connections.get(id);
-                    if (id.equals(to.getId())) {
-                        s.sendMessage(new TextMessage(msgResponse.toJson()));
-                        isTargetOnline = true;
+                // direct message
+                if (accountService.hasUser(chatMessage.getTo())) {
+                    Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
+                    boolean isTargetOnline = false;
+                    for (Integer id : connections.keySet()) {
+                        WebSocketSession s = connections.get(id);
+                        if (id.equals(to.getId())) {
+                            s.sendMessage(new TextMessage(msgResponse.toJson()));
+                            isTargetOnline = true;
+                        }
+                    }
+                    if (!isTargetOnline) {
+                        cacheMessage(to.getId(), chatMessage);
                     }
                 }
-                if (!isTargetOnline) {
-                    // 先将消息缓存
-                    Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + to.getId());
-                    List<ChatMessage> caches;
-                    if (cache0 == null) {
-                        caches = new ArrayList<>();
-                    } else {
-                        caches = (List<ChatMessage>) cache0; // wtf unchecked cast
+                else if (groupsService.hasGroup(chatMessage.getTo())) {
+                    Group group = groupsService.getGroupByName(chatMessage.getTo());
+                    for (Integer memberId : group.getMembers()) {
+                        WebSocketSession targetSession = connections.get(memberId);
+                        if (targetSession != null) {
+                            targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
+                        } else {
+                            // Add to temperature
+                            cacheMessage(memberId, chatMessage);
+                        }
                     }
-                    caches.add(chatMessage);
-                    // 只缓存<timeout>天
-                    redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + to.getId(), caches, 7, TimeUnit.DAYS);
                 }
             }
             case RequestType.ADD_FRIEND -> {

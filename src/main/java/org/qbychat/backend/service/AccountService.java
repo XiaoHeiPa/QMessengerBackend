@@ -21,4 +21,6 @@ public interface AccountService extends IService<Account>, UserDetailsService {
     void updateUser(Account account);
 
     boolean hasUser(String name);
+
+    boolean hasUser(Integer id);
 }
