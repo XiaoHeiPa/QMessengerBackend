@@ -58,53 +58,57 @@ public class QMessengerHandler extends AuthedTextHandler {
         String method = request.getMethod();
         Account account = getUser(session);
 
-        if (method.equals(RequestType.SEND_MESSAGE)) {
-            ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
-            log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
-            // send message
-            // todo 实现群组, 离线消息, fcm
+        switch (method) {
+            case RequestType.SEND_MESSAGE -> {
+                ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
+                log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
+                // send message
+                // todo 实现群组, 离线消息, fcm
 
-            // 找到目标并发送
-            Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
-            chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
-            Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
-            boolean isTargetOnline = false;
-            for (Integer id : connections.keySet()) {
-                WebSocketSession s = connections.get(id);
-                if (id.equals(to.getId())) {
-                    s.sendMessage(new TextMessage(msgResponse.toJson()));
-                    isTargetOnline = true;
+                // 找到目标并发送
+                Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
+                chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
+                Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
+                boolean isTargetOnline = false;
+                for (Integer id : connections.keySet()) {
+                    WebSocketSession s = connections.get(id);
+                    if (id.equals(to.getId())) {
+                        s.sendMessage(new TextMessage(msgResponse.toJson()));
+                        isTargetOnline = true;
+                    }
+                }
+                if (!isTargetOnline) {
+                    // 先将消息缓存
+                    Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + to.getId());
+                    List<ChatMessage> caches;
+                    if (cache0 == null) {
+                        caches = new ArrayList<>();
+                    } else {
+                        caches = (List<ChatMessage>) cache0; // wtf unchecked cast
+                    }
+                    caches.add(chatMessage);
+                    // 只缓存<timeout>天
+                    redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + to.getId(), caches, 7, TimeUnit.DAYS);
                 }
             }
-            if (!isTargetOnline) {
-                // 先将消息缓存
-                Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + to.getId());
-                List<ChatMessage> caches;
-                if (cache0 == null) {
-                    caches = new ArrayList<>();
-                } else {
-                    caches = (List<ChatMessage>) cache0; // wtf unchecked cast
+            case RequestType.ADD_FRIEND -> {
+                AddFriendRequest friendRequest = JSON.parseObject(request.getDataJson(), AddFriendRequest.class);
+                Integer target = friendRequest.getTarget();
+                friendRequest.setFrom(account.getId());
+                if (friendsService.hasFriend(account, accountService.findAccountById(target))) {
+                    session.sendMessage(new TextMessage(Response.HAS_FRIEND.toJson()));
+                    return;
                 }
-                caches.add(chatMessage);
-                // 只缓存<timeout>天
-                redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + to.getId(), caches, 7, TimeUnit.DAYS);
+                // 发送请求
+                session.sendMessage(new TextMessage(Response.FRIEND_REQUEST_SENT.toJson()));
+                // find target session
+                WebSocketSession targetWebsocket = connections.get(target);
+                targetWebsocket.sendMessage(new TextMessage(Response.FRIEND_REQUEST.setData(friendRequest).toJson()));
             }
-        } else if (method.equals(RequestType.ADD_FRIEND)) {
-            AddFriendRequest friendRequest = JSON.parseObject(request.getDataJson(), AddFriendRequest.class);
-            Integer target = friendRequest.getTarget();
-            friendRequest.setFrom(account.getId());
-            if (friendsService.hasFriend(account, accountService.findAccountById(target))) {
-                session.sendMessage(new TextMessage(Response.HAS_FRIEND.toJson()));
-                return;
+            case RequestType.ACCEPT_FRIEND_REQUEST -> {
+                Integer target = JSON.parseObject(request.getDataJson(), Integer.class);
+                log.info(target);
             }
-            // 发送请求
-            session.sendMessage(new TextMessage(Response.FRIEND_REQUEST_SENT.toJson()));
-            // find target session
-            WebSocketSession targetWebsocket = connections.get(target);
-            targetWebsocket.sendMessage(new TextMessage(Response.FRIEND_REQUEST.setData(friendRequest).toJson()));
-        } else if (method.equals(RequestType.ACCEPT_FRIEND_REQUEST)) {
-            Integer target = JSON.parseObject(request.getDataJson(), Integer.class);
-            log.info(target);
         }
     }
 
