@@ -10,6 +10,7 @@ import org.qbychat.backend.mapper.GroupMapper;
 import org.qbychat.backend.service.GroupsService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -30,7 +31,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
         group.setOwner(owner.getId());
         group.setCreateTime(new Date());
         group.setDescription("The default description. QvQ");
-        group.setMembers(new HashSet<>()); // 用戶是后期加入的, QMessenger尊重用户的选择, 必须用户同意后才可进入群组.
+        group.setMembers(new ArrayList<>()); // 用戶是后期加入的, QMessenger尊重用户的选择, 必须用户同意后才可进入群组.
         group.setName(name);
         if (this.hasGroup(group.getName())) {
             return false;

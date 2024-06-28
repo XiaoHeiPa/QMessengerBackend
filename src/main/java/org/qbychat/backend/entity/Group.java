@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -21,5 +22,5 @@ public class Group {
     private String name;
     private String description;
     private Date createTime;
-    private Set<Integer> members;
+    private List<Integer> members;
 }
