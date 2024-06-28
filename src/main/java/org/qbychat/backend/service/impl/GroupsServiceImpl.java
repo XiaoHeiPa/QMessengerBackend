@@ -1,5 +1,7 @@
 package org.qbychat.backend.service.impl;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.mybatisflex.core.handler.BaseJsonTypeHandler;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -31,7 +33,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
         group.setOwner(owner.getId());
         group.setCreateTime(new Date());
         group.setDescription("The default description. QvQ");
-        group.setMembers(new ArrayList<>()); // 用戶是后期加入的, QMessenger尊重用户的选择, 必须用户同意后才可进入群组.
+        group.setMembers(new HashSet<>()); // 群成员是后期加入的, QMessenger尊重用户的选择, 必须用户同意后才可进入群组.
         group.setName(name);
         if (this.hasGroup(group.getName())) {
             return false;

@@ -1,8 +1,11 @@
 package org.qbychat.backend.entity;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
+import com.mybatisflex.core.handler.Fastjson2TypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +25,6 @@ public class Group {
     private String name;
     private String description;
     private Date createTime;
-    private List<Integer> members;
+    @Column(typeHandler = Fastjson2TypeHandler.class)
+    private Set<Integer> members;
 }
