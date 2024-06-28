@@ -16,8 +16,15 @@ public enum Response {
     public final String method;
     Object data;
 
+    @Data
+    @AllArgsConstructor
+    private static class ResponseJson {
+        public final String method;
+        Object data;
+    }
+
     public String toJson() {
-        return JSONObject.toJSONString(this, JSONWriter.Feature.WriteNulls);
+        return JSONObject.toJSONString(new ResponseJson(method, data), JSONWriter.Feature.WriteNulls);
     }
 
     public Response setData(Object data) {
