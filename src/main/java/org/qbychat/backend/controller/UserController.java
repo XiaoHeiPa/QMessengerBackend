@@ -106,6 +106,10 @@ private final EmailServiceImpl emailService = new EmailServiceImpl();
     public RestBean<String> changePassword(@RequestParam("password") String password, @NotNull HttpServletRequest request) {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         accountService.updatePassword(user, passwordEncoder.encode(password));
-        return RestBean.success("Password changed.");
+        // logout current client
+        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
+            return RestBean.success("Password changed.");
+        }
+        return RestBean.failure(500, "Password changed, but failed to logout.");
     }
 }
