@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-admin:9.2.0")
     implementation("com.auth0:java-jwt:4.3.0")
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.37")
