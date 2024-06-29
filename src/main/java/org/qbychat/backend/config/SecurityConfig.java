@@ -3,11 +3,11 @@ package org.qbychat.backend.config;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.AuthorizeVO;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.Roles;
+import org.qbychat.backend.filter.CorsFilter;
 import org.qbychat.backend.filter.JwtAuthorizeFilter;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
@@ -23,8 +23,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,7 +35,9 @@ public class SecurityConfig {
     @Resource
     JwtUtils jwtUtils;
     @Resource
-    JwtAuthorizeFilter filter;
+    JwtAuthorizeFilter jwtFilter;
+    @Resource
+    CorsFilter corsFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -80,7 +80,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 //                .cors(AbstractHttpConfigurer::disable) // unsafe
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(corsFilter, JwtAuthorizeFilter.class)
                 .build();
     }
 
