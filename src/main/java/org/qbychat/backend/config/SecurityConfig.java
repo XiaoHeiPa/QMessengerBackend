@@ -79,7 +79,7 @@ public class SecurityConfig {
                 .sessionManagement(conf -> conf
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .cors(AbstractHttpConfigurer::disable) // unsafe
+//                .cors(AbstractHttpConfigurer::disable) // unsafe
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
