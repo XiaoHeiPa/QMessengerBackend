@@ -18,7 +18,6 @@ import java.util.Date;
  * @since 2024-06-15
  */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(value = "db_account")
