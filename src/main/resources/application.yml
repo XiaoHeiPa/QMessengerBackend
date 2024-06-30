@@ -10,7 +10,12 @@ spring:
     username: proc
     password: qbychatproc114514%
     driver-class-name: com.mysql.cj.jdbc.Driver
-  # Mail config moved to MailConfig.java
+  # Mail config moved to MailConfig.
+#server:
+#  ssl:
+#    certificate: "classpath:public.crt"
+#    certificate-private-key: "classpath:private.key"
+#    trust-certificate: "classpath:public.crt"
 messenger:
   verify:
     email-verify-url: http://localhost:8080/user/apply-register?uuid=
