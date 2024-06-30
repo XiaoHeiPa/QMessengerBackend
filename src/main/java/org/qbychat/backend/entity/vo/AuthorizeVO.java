@@ -1,4 +1,4 @@
-package org.qbychat.backend.entity;
+package org.qbychat.backend.entity.vo;
 
 import lombok.Data;
 

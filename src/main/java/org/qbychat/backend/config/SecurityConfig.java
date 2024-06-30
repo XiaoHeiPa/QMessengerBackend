@@ -4,7 +4,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.AuthorizeVO;
+import org.qbychat.backend.entity.vo.AuthorizeVO;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.filter.CorsFilter;
