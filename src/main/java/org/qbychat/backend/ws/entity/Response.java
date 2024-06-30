@@ -7,24 +7,32 @@ import lombok.Data;
 
 @AllArgsConstructor
 public enum Response {
-    LOCATE("locate", null),
-    HAS_FRIEND("has-friend", null),
-    FRIEND_REQUEST("friend-request", null),
-    FRIEND_REQUEST_SENT("friend-request-sent", null),
-    CHAT_MESSAGE("chat-message", null);
+    LOCATE("locate"),
+
+    HAS_FRIEND("has-friend"),
+    FRIEND_REQUEST("friend-request"),
+    FRIEND_REQUEST_SENT("friend-request-sent"),
+    CHAT_MESSAGE("chat-message"),
+    USER_INFO("user-info");
 
     public final String method;
     Object data;
+    final boolean hasError = false;
+
+    Response(String method) {
+        this.method = method;
+    }
 
     @Data
     @AllArgsConstructor
     private static class ResponseJson {
         public final String method;
         Object data;
+        boolean hasError = false;
     }
 
     public String toJson() {
-        return JSONObject.toJSONString(new ResponseJson(method, data), JSONWriter.Feature.WriteNulls);
+        return JSONObject.toJSONString(new ResponseJson(method, data, hasError), JSONWriter.Feature.WriteNulls);
     }
 
     public Response setData(Object data) {

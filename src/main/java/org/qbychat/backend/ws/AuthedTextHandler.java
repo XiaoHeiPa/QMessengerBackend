@@ -5,9 +5,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.AuthorizeVO;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
+import org.qbychat.backend.ws.entity.Response;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -39,9 +41,10 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
                 return;
             }
             log.info("User {} has connected to {}", account.getId(), this.getClass().getName());
-            session.sendMessage(new TextMessage(RestBean.success(account).toJson()));
+            AuthorizeVO authorizeVO = account.asViewObject(AuthorizeVO.class);
+            session.sendMessage(new TextMessage(Response.USER_INFO.setData(authorizeVO).toJson()));
         } else {
-            session.sendMessage(new TextMessage(RestBean.forbidden("Valid token").toJson()));
+            session.sendMessage(new TextMessage(Response.USER_INFO.toJson()));
             session.close();
             return;
         }
