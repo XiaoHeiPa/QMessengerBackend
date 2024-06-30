@@ -41,7 +41,7 @@ public class QMessengerHandler extends AuthedTextHandler {
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
     @Override
-    protected void afterAuthed(@NotNull WebSocketSession session, Account account) throws Exception {
+    protected void afterAuthorization(@NotNull WebSocketSession session, Account account) throws Exception {
         connections.put(account.getId(), session);
         // 发送离线时收到的消息
         Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + account.getId());

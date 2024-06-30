@@ -45,10 +45,10 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
             session.close();
             return;
         }
-        afterAuthed(session, account);
+        afterAuthorization(session, account);
     }
 
-    protected void afterAuthed(@NotNull WebSocketSession session, Account account) throws Exception {}
+    protected void afterAuthorization(@NotNull WebSocketSession session, Account account) throws Exception {}
 
     protected Account getUser(@NotNull WebSocketSession session) {
         List<String> authorization = session.getHandshakeHeaders().get("Authorization");

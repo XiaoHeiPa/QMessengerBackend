@@ -40,7 +40,7 @@ public class FindDeviceHandler extends AuthedTextHandler {
     }
 
     @Override
-    protected void afterAuthed(@NotNull WebSocketSession session, Account account) throws Exception {
+    protected void afterAuthorization(@NotNull WebSocketSession session, Account account) throws Exception {
         List<String> list = session.getHandshakeHeaders().get("meid");
         if (list == null) {
             session.close(); // stop connecting with PostMan, lol
