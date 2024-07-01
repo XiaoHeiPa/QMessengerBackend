@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
-import org.qbychat.backend.entity.vo.AccountVO;
+import org.qbychat.backend.entity.dto.AccountDTO;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
 import org.qbychat.backend.ws.entity.Response;
@@ -38,7 +38,7 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
                 return;
             }
             log.info("User {} has connected to {}", account.getId(), this.getClass().getName());
-            AccountVO authorizeVO = account.asViewObject(AccountVO.class);
+            AccountDTO authorizeVO = account.asViewObject(AccountDTO.class);
             session.sendMessage(new TextMessage(Response.USER_INFO.setData(authorizeVO).toJson()));
         } else {
             session.sendMessage(new TextMessage(Response.USER_INFO.toJson()));

@@ -3,16 +3,14 @@ package org.qbychat.backend.service.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
-import jakarta.annotation.Resource;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Roles;
-import org.qbychat.backend.entity.table.AccountTableDef;
+import org.qbychat.backend.entity.table.AccountsTableDef;
 import org.qbychat.backend.mapper.AccountMapper;
 import org.qbychat.backend.service.AccountService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,16 +35,16 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     public Account findAccountByNameOrEmail(String username) {
         QueryWrapper qw = new QueryWrapper();
-        qw.select(AccountTableDef.getInstance().ALL_COLUMNS)
-                .where(AccountTableDef.getInstance().USERNAME.eq(username))
-                .or(AccountTableDef.getInstance().EMAIL.eq(username));
+        qw.select(AccountsTableDef.ACCOUNTS.ALL_COLUMNS)
+                .where(AccountsTableDef.ACCOUNTS.USERNAME.eq(username))
+                .or(AccountsTableDef.ACCOUNTS.EMAIL.eq(username));
         return this.mapper.selectOneByQuery(qw);
     }
 
     public Account findAccountById(Integer id) {
         QueryWrapper qw = new QueryWrapper();
-        qw.select(AccountTableDef.getInstance().ALL_COLUMNS)
-                .where(AccountTableDef.getInstance().ID.eq(id));
+        qw.select(AccountsTableDef.ACCOUNTS.ALL_COLUMNS)
+                .where(AccountsTableDef.ACCOUNTS.ID.eq(id));
         return this.mapper.selectOneByQuery(qw);
     }
 

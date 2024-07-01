@@ -22,7 +22,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(value = "db_account")
 public class Account implements BaseData {
-
     @Id(keyType = KeyType.Auto)
     private Integer id;
     private String username;

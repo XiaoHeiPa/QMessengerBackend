@@ -5,8 +5,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.ChatMessage;
 import org.qbychat.backend.entity.Group;
-import org.qbychat.backend.service.AccountService;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
@@ -17,10 +17,8 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -35,38 +33,12 @@ public class QMessengerHandler extends AuthedTextHandler {
     @Resource
     GroupsServiceImpl groupsService;
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
     @Override
-    protected void afterAuthorization(@NotNull WebSocketSession session, Account account) throws Exception {
+    protected void afterAuthorization(@NotNull WebSocketSession session, Account account) {
         connections.put(account.getId(), session);
-        // 发送离线时收到的消息
-        Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + account.getId());
-        if (cache0 != null) {
-            List<ChatMessage> caches = (List<ChatMessage>) cache0;
-            for (ChatMessage chatMessage : caches) {
-                Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
-                session.sendMessage(new TextMessage(msgResponse.toJson()));
-            }
-        }
     }
-
-    private void cacheMessage(int id, ChatMessage chatMessage) {
-        Object cache0 = redisTemplate.opsForValue().get(Const.CACHED_MESSAGE + id);
-        List<ChatMessage> caches;
-        if (cache0 == null) {
-            caches = new ArrayList<>();
-        } else {
-            caches = (List<ChatMessage>) cache0; // wtf unchecked cast
-        }
-        caches.add(chatMessage);
-        // 只缓存<timeout>天
-        redisTemplate.opsForValue().set(Const.CACHED_MESSAGE + id, caches, 7, TimeUnit.DAYS);
-    }
-
 
     @Override
     protected void handleTextMessage(@NotNull WebSocketSession session, @NotNull TextMessage message) throws Exception {
@@ -78,36 +50,23 @@ public class QMessengerHandler extends AuthedTextHandler {
         switch (method) {
             case RequestType.SEND_MESSAGE -> {
                 ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
-//                log.info("Message from {} to {}: {}", account.getUsername(), chatMessage.getTo(), chatMessage.getContent());
                 // send message
                 // todo fcm
                 // 找到目标并发送
                 chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
                 Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
                 // direct message
-                if (accountService.hasUser(chatMessage.getTo())) {
-                    Account to = accountService.findAccountByNameOrEmail(chatMessage.getTo());
-                    boolean isTargetOnline = false;
-                    for (Integer id : connections.keySet()) {
-                        WebSocketSession s = connections.get(id);
-                        if (id.equals(to.getId())) {
-                            s.sendMessage(new TextMessage(msgResponse.toJson()));
-                            isTargetOnline = true;
-                        }
+                if (!chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
+                    WebSocketSession targetSession = connections.get(chatMessage.getTo());
+                    if (targetSession != null) {
+                        targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
                     }
-                    if (!isTargetOnline) {
-                        cacheMessage(to.getId(), chatMessage);
-                    }
-                }
-                else if (groupsService.hasGroup(chatMessage.getTo())) {
-                    Group group = groupsService.getGroupByName(chatMessage.getTo());
+                } else if (chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
+                    Group group = groupsService.getGroupById(chatMessage.getTo());
                     for (Integer memberId : group.getMembers()) {
                         WebSocketSession targetSession = connections.get(memberId);
                         if (targetSession != null) {
                             targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
-                        } else {
-                            // Add to temperature
-                            cacheMessage(memberId, chatMessage);
                         }
                     }
                 }
