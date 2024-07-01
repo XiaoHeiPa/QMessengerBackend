@@ -26,6 +26,6 @@ public class MessagesTableDef extends TableDef {
     public static final MessagesTableDef MESSAGES = new MessagesTableDef();
 
     public MessagesTableDef() {
-        super("", "db_message");
+        super("", "db_messages");
     }
 }

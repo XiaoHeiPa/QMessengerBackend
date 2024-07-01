@@ -29,6 +29,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.ID.eq(channel))
                 .and(MESSAGES.IS_DM.eq(isDirectMessage));
-        return this.mapper.selectListByQuery(qw);
+        return this.mapper.paginate(1, 100, qw).getRecords();
     }
 }
