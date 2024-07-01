@@ -10,6 +10,7 @@ import org.qbychat.backend.entity.Group;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
+import org.qbychat.backend.service.impl.MessageServiceImpl;
 import org.qbychat.backend.utils.Const;
 import org.qbychat.backend.ws.entity.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,6 +33,8 @@ public class QMessengerHandler extends AuthedTextHandler {
     AccountServiceImpl accountService;
     @Resource
     GroupsServiceImpl groupsService;
+    @Resource
+    MessageServiceImpl messageService;
 
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
@@ -54,7 +57,9 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // todo fcm
                 // 找到目标并发送
                 chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
+                chatMessage.setSender(account.getId());
                 Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
+                messageService.addMessage(chatMessage);
                 // direct message
                 if (!chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
                     WebSocketSession targetSession = connections.get(chatMessage.getTo());

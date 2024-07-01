@@ -39,7 +39,7 @@ public class ChatMessage implements BaseData {
     @NoArgsConstructor
     @Builder
     static class MessageContent {
-        String description;
+        String description = null;
         String text;
         @Builder.Default
         Integer replyTo = null;
