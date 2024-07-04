@@ -25,8 +25,9 @@ public class Account implements BaseData {
     @Id(keyType = KeyType.Auto)
     private Integer id;
     private String username;
-    private String password;
     private String email;
+    private String bio = "";
+    private String password;
     private String role;
     @Column(value = "registerTime")
     private Date registerTime;
