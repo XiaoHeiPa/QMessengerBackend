@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashSet;
 
-import static org.qbychat.backend.entity.table.GroupsTableDef.*;
+import static org.qbychat.backend.entity.table.GroupsTableDef.GROUPS;
 
 @Service
 public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implements GroupsService {

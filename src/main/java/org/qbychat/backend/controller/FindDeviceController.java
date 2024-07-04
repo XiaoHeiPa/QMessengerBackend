@@ -8,8 +8,10 @@ import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.ws.FindDeviceHandler;
 import org.qbychat.backend.ws.entity.Location;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

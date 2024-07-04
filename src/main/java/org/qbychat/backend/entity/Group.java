@@ -1,6 +1,5 @@
 package org.qbychat.backend.entity;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -11,7 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Data

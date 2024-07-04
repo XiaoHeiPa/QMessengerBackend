@@ -1,6 +1,5 @@
 package org.qbychat.backend.controller;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -9,7 +8,6 @@ import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Email;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.Roles;
-import org.qbychat.backend.service.FriendsService;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.web.header.Header;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -43,8 +40,8 @@ public class UserController {
 
     @Resource
     private JwtUtils jwtUtils;
-    //    @Resource
-    private final EmailServiceImpl emailService = new EmailServiceImpl();
+    @Resource
+    private EmailServiceImpl emailService;
 
     @Value("${messenger.verify.email-verify-url}")
     String verifyUrl;
@@ -77,11 +74,11 @@ public class UserController {
         redisTemplate.opsForValue().set(ACCOUNT_VERIFY + newAccountUuid, newAccount);
         Email verifyEmail = new Email();
         verifyEmail.setTo(email);
-        verifyEmail.setSubject("QbyChat Verify Email");
+        verifyEmail.setSubject("QvQ Messenger Verification");
         verifyEmail.setContent("This is a verify Email. Please click the verify url to continue registration: " + verifyUrl + newAccountUuid);
         String emailReturn = emailService.sendVerifyEmail(verifyEmail);
         if (Objects.equals(emailReturn, "Succeed!")) {
-            log.info("New account try to register with email: {} UUID: {}", newAccount.getEmail(), newAccountUuid);
+            log.info("New account tried to register with email: {} UUID: {}", newAccount.getEmail(), newAccountUuid);
             return RestBean.success("请从您的邮箱中获取验证链接！");
         } else {
             log.error(emailReturn);

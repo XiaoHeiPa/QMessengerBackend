@@ -11,18 +11,16 @@ import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.service.impl.MessageServiceImpl;
-import org.qbychat.backend.utils.Const;
-import org.qbychat.backend.ws.entity.*;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.qbychat.backend.ws.entity.AddFriendRequest;
+import org.qbychat.backend.ws.entity.Request;
+import org.qbychat.backend.ws.entity.RequestType;
+import org.qbychat.backend.ws.entity.Response;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class QMessengerHandler extends AuthedTextHandler {

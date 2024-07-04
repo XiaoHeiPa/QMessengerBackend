@@ -7,7 +7,6 @@ import org.qbychat.backend.entity.Group;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
