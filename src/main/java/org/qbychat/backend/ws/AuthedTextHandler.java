@@ -41,7 +41,7 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
             AccountDTO authorizeVO = account.asViewObject(AccountDTO.class);
             session.sendMessage(new TextMessage(Response.USER_INFO.setData(authorizeVO).toJson()));
         } else {
-            session.sendMessage(new TextMessage(Response.USER_INFO.toJson()));
+            session.sendMessage(new TextMessage(Response.builder().method(Response.USER_INFO.method).hasError(true).data("Please provide a token").build().toJson()));
             session.close();
             return;
         }
