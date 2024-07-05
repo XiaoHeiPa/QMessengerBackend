@@ -55,12 +55,13 @@ public class QMessengerHandler extends AuthedTextHandler {
                 Response msgResponse = chatMessage.toResponse();
                 messageService.addMessage(chatMessage);
                 // direct message
-                if (!chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
+                if (chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
+                    session.sendMessage(new TextMessage(msgResponse.toJson()));
                     WebSocketSession targetSession = connections.get(chatMessage.getTo());
                     if (targetSession != null) {
                         targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
                     }
-                } else if (chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
+                } else if (!chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
                     Group group = groupsService.getGroupById(chatMessage.getTo());
                     for (Integer memberId : group.getMembers()) {
                         WebSocketSession targetSession = connections.get(memberId);

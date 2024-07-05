@@ -38,10 +38,22 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.TO.eq(channel))
-                .where(MESSAGES.IS_DM.eq(isDM));
+                .and(MESSAGES.IS_DM.eq(isDM));
         int total = this.mapper.selectListByQuery(qw).size();
+        if (total == 0) {
+            return List.of();
+        }
         List<Message> records = new ArrayList<>(this.mapper.paginate(total - 1, pageSize, qw)
                 .getRecords());
+        if (isDM) {
+            // 查询对面发送的信息
+            QueryWrapper qw1 = new QueryWrapper();
+            qw1.select(MESSAGES.ALL_COLUMNS)
+                    .where(MESSAGES.SENDER.eq(channel))
+                    .and(MESSAGES.IS_DM.eq(true));
+            records.addAll(this.mapper.paginate(total - 1, pageSize, qw1).getRecords());
+            records.addAll(this.mapper.paginate(total - 2, pageSize, qw1).getRecords());
+        }
         records.addAll(this.mapper.paginate(total - 2, pageSize, qw).getRecords());
         return records;
     }
