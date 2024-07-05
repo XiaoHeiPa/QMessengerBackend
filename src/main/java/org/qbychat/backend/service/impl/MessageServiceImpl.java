@@ -44,7 +44,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (total == 0) {
             return List.of();
         } else {
-            records = new ArrayList<>(this.mapper.paginate(total - 1, pageSize, qw).getRecords());
+            records = new ArrayList<>(this.mapper.paginate(total, pageSize, qw).getRecords());
         }
         if (isDM) {
             // 查询对面发送的信息
@@ -54,10 +54,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     .where(MESSAGES.SENDER.eq(channel))
                     .and(MESSAGES.IS_DM.eq(true));
             int total1 = this.mapper.selectListByQuery(qw1).size();
-            records.addAll(this.mapper.paginate(total1 - 1, pageSize, qw1).getRecords());
-            records.addAll(this.mapper.paginate(total1 - 2, pageSize, qw1).getRecords());
+            records.addAll(this.mapper.paginate(total1, pageSize, qw1).getRecords());
+            if (total1 > 1) {
+                records.addAll(this.mapper.paginate(total1 - 1, pageSize, qw1).getRecords());
+            }
         }
-        records.addAll(this.mapper.paginate(total - 2, pageSize, qw).getRecords());
+        if (total > 1) {
+            records.addAll(this.mapper.paginate(total - 1, pageSize, qw).getRecords());
+        }
         return records;
     }
 
