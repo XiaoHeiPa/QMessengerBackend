@@ -30,7 +30,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
         group.setOwner(owner.getId());
         group.setCreateTime(new Date());
         group.setDescription("The default description. QvQ");
-        group.setMembers(new HashSet<>()); // 群成员是后期加入的, QMessenger尊重用户的选择, 必须用户同意后才可进入群组.
+        group.setMembers(new HashSet<>());
         group.setName(name);
         if (this.hasGroup(group.getName())) {
             return false;

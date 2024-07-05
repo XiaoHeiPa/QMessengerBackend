@@ -6,10 +6,9 @@ import lombok.extern.log4j.Log4j2;
 import org.qbychat.backend.entity.Email;
 import org.qbychat.backend.mapper.EmailMapper;
 import org.qbychat.backend.service.EmailService;
-import org.qbychat.backend.utils.QMailSender;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 
@@ -18,8 +17,8 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl extends ServiceImpl<EmailMapper, Email> implements EmailService {
     protected final String from = "qby";
 
-    @Autowired
-    QMailSender mailSender;
+    @Resource
+    JavaMailSenderImpl mailSender;
 
     public String sendVerifyEmail(Email verifyEmail) {
         SimpleMailMessage message = new SimpleMailMessage();

@@ -10,12 +10,28 @@ spring:
     username: proc
     password: qbychatproc114514%
     driver-class-name: com.mysql.cj.jdbc.Driver
-  # Mail config moved to MailConfig.
-#server:
-#  ssl:
-#    certificate: "classpath:public.crt"
-#    certificate-private-key: "classpath:private.key"
-#    trust-certificate: "classpath:public.crt"
+  mail:
+    username: zxysb
+    password: qwer1145
+    host: smtp-mail.outlook.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+#          ssl:
+#            enable: true
+#            socketFactory:
+#              class: com.sun.mail.util.MailSSLSocketFactory
+#              fallback: false
+          auth: true
+        starttls:
+          enable: true
+          required: true
+    test-connection: true
+
 messenger:
   verify:
     email-verify-url: http://localhost:8080/user/apply-register?uuid=
+  message:
+    page:
+      size: 100
