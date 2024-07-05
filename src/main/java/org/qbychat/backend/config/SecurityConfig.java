@@ -56,6 +56,7 @@ public class SecurityConfig {
                                 .requestMatchers("/user/**").authenticated()
                                 .requestMatchers("/find-device/**").authenticated()
                                 .requestMatchers("/group/**").authenticated()
+                                .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/group/query/").permitAll()
                                 .requestMatchers("/admin/**").hasRole(Roles.ADMIN.name())
                                 .anyRequest().permitAll()
@@ -79,9 +80,9 @@ public class SecurityConfig {
                 .sessionManagement(conf -> conf
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-//                .cors(AbstractHttpConfigurer::disable) // unsafe
+                .cors(AbstractHttpConfigurer::disable) // unsafe
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(corsFilter, JwtAuthorizeFilter.class)
+                .addFilterAfter(corsFilter, JwtAuthorizeFilter.class)
                 .build();
     }
 
