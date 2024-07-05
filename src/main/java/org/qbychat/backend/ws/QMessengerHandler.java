@@ -5,21 +5,19 @@ import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.ChatMessage;
+import org.qbychat.backend.entity.Message;
 import org.qbychat.backend.entity.Group;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.service.impl.MessageServiceImpl;
-import org.qbychat.backend.ws.entity.AddFriendRequest;
-import org.qbychat.backend.ws.entity.Request;
-import org.qbychat.backend.ws.entity.RequestType;
-import org.qbychat.backend.ws.entity.Response;
+import org.qbychat.backend.ws.entity.*;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Log4j2
@@ -50,13 +48,11 @@ public class QMessengerHandler extends AuthedTextHandler {
 
         switch (method) {
             case RequestType.SEND_MESSAGE -> {
-                ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
+                Message chatMessage = JSON.parseObject(request.getDataJson(), Message.class);
                 // send message
-                // todo fcm
                 // 找到目标并发送
-                chatMessage.setTimestamp(Calendar.getInstance().getTimeInMillis());
                 chatMessage.setSender(account.getId());
-                Response msgResponse = Response.CHAT_MESSAGE.setData(chatMessage);
+                Response msgResponse = chatMessage.toResponse();
                 messageService.addMessage(chatMessage);
                 // direct message
                 if (!chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
@@ -73,9 +69,8 @@ public class QMessengerHandler extends AuthedTextHandler {
                         }
                     }
                 }
-            }
-            case RequestType.ADD_FRIEND -> {
-                AddFriendRequest friendRequest = JSON.parseObject(request.getDataJson(), AddFriendRequest.class);
+            } case RequestType.ADD_FRIEND -> {
+                RequestAddFriend friendRequest = JSON.parseObject(request.getDataJson(), RequestAddFriend.class);
                 Integer target = friendRequest.getTarget();
                 friendRequest.setFrom(account.getId());
                 if (friendsService.hasFriend(account, accountService.findAccountById(target))) {
@@ -87,10 +82,15 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // find target session
                 WebSocketSession targetWebsocket = connections.get(target);
                 targetWebsocket.sendMessage(new TextMessage(Response.FRIEND_REQUEST.setData(friendRequest).toJson()));
-            }
-            case RequestType.ACCEPT_FRIEND_REQUEST -> {
+            } case RequestType.ACCEPT_FRIEND_REQUEST -> {
                 Integer target = JSON.parseObject(request.getDataJson(), Integer.class);
-                log.info(target);
+                friendsService.addFriend(getUser(session), accountService.findAccountById(target));
+            } case RequestType.FETCH_LATEST_MESSAGES -> {
+                RequestFetchLatestMessages data = JSON.parseObject(request.getDataJson(), RequestFetchLatestMessages.class);
+                List<Message> messages = messageService.fetchLatestMessages(data.getChannel(), data.isDirectMessage());
+                for (Message chatMessage : messages) {
+                    session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
+                }
             }
         }
     }

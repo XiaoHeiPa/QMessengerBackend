@@ -6,6 +6,11 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.handler.Fastjson2TypeHandler;
 import lombok.*;
+import org.qbychat.backend.ws.entity.Response;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketMessage;
+
+import java.util.Calendar;
 
 
 @Data
@@ -13,7 +18,7 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(value = "db_messages")
-public class ChatMessage implements BaseData {
+public class Message implements BaseData {
     @Id(keyType = KeyType.Auto)
     private Integer id;
 
@@ -26,6 +31,15 @@ public class ChatMessage implements BaseData {
 
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private MessageContent content;
+
+    public Response toResponse() {
+        this.setTimestamp(Calendar.getInstance().getTimeInMillis());
+        return Response.CHAT_MESSAGE.setData(this);
+    }
+
+    public TextMessage toWSTextMessage() {
+        return new TextMessage(this.toResponse().toJson());
+    }
 
     enum MessageType {
         TEXT,
