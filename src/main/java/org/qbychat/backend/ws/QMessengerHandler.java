@@ -5,18 +5,18 @@ import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.Message;
 import org.qbychat.backend.entity.Group;
+import org.qbychat.backend.entity.Message;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.service.impl.MessageServiceImpl;
 import org.qbychat.backend.ws.entity.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,7 +70,8 @@ public class QMessengerHandler extends AuthedTextHandler {
                         }
                     }
                 }
-            } case RequestType.ADD_FRIEND -> {
+            }
+            case RequestType.ADD_FRIEND -> {
                 RequestAddFriend friendRequest = JSON.parseObject(request.getDataJson(), RequestAddFriend.class);
                 Integer target = friendRequest.getTarget();
                 friendRequest.setFrom(account.getId());
@@ -83,12 +84,25 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // find target session
                 WebSocketSession targetWebsocket = connections.get(target);
                 targetWebsocket.sendMessage(new TextMessage(Response.FRIEND_REQUEST.setData(friendRequest).toJson()));
-            } case RequestType.ACCEPT_FRIEND_REQUEST -> {
+            }
+            case RequestType.ACCEPT_FRIEND_REQUEST -> {
                 Integer target = JSON.parseObject(request.getDataJson(), Integer.class);
                 friendsService.addFriend(getUser(session), accountService.findAccountById(target));
-            } case RequestType.FETCH_LATEST_MESSAGES -> {
+            }
+            case RequestType.FETCH_LATEST_MESSAGES -> {
                 RequestFetchLatestMessages data = JSON.parseObject(request.getDataJson(), RequestFetchLatestMessages.class);
-                List<Message> messages = messageService.fetchLatestMessages(data.getChannel(), data.isDirectMessage());
+                List<Message> messages;
+                int channel = data.getChannel();
+                if (data.isDirectMessage()) {
+                    messages = messageService.fetchLatestDirectMessages(channel, account.getId());
+                } else {
+                    Group group = groupsService.getGroupById(channel);
+                    if (group.getMembers().contains(account.getId())) {
+                        messages = messageService.fetchLatestGroupMessages(channel);
+                    } else {
+                        messages = List.of();
+                    }
+                }
                 for (Message chatMessage : messages) {
                     session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
                 }
