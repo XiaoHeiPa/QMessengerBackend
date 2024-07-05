@@ -40,19 +40,22 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .where(MESSAGES.TO.eq(channel))
                 .and(MESSAGES.IS_DM.eq(isDM));
         int total = this.mapper.selectListByQuery(qw).size();
+        List<Message> records;
         if (total == 0) {
             return List.of();
+        } else {
+            records = new ArrayList<>(this.mapper.paginate(total - 1, pageSize, qw).getRecords());
         }
-        List<Message> records = new ArrayList<>(this.mapper.paginate(total - 1, pageSize, qw)
-                .getRecords());
         if (isDM) {
             // 查询对面发送的信息
+
             QueryWrapper qw1 = new QueryWrapper();
             qw1.select(MESSAGES.ALL_COLUMNS)
                     .where(MESSAGES.SENDER.eq(channel))
                     .and(MESSAGES.IS_DM.eq(true));
-            records.addAll(this.mapper.paginate(total - 1, pageSize, qw1).getRecords());
-            records.addAll(this.mapper.paginate(total - 2, pageSize, qw1).getRecords());
+            int total1 = this.mapper.selectListByQuery(qw1).size();
+            records.addAll(this.mapper.paginate(total1 - 1, pageSize, qw1).getRecords());
+            records.addAll(this.mapper.paginate(total1 - 2, pageSize, qw1).getRecords());
         }
         records.addAll(this.mapper.paginate(total - 2, pageSize, qw).getRecords());
         return records;
