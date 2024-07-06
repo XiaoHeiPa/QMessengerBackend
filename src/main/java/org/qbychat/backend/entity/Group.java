@@ -21,6 +21,7 @@ public class Group {
     private Integer id;
     private Integer owner;
     private String name;
+    private String shownName;
     private String description;
     private Date createTime;
     @Column(typeHandler = Fastjson2TypeHandler.class)

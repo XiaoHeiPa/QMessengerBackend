@@ -14,6 +14,7 @@ public class GroupsTableDef extends TableDef {
 
 
     public final QueryColumn GROUP_NAME = new QueryColumn(this, "name");
+    public final QueryColumn GROUP_SHOWN_NAME = new QueryColumn(this, "shownName");
 
 
     public final QueryColumn CREATE_TIME = new QueryColumn(this, "createTime");
@@ -30,7 +31,7 @@ public class GroupsTableDef extends TableDef {
     /**
      * 默认字段，不包含逻辑删除或者 large 等字段。
      */
-    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, GROUP_NAME, DESCRIPTION, CREATE_TIME, OWNER, MEMBERS};
+    public final QueryColumn[] DEFAULT_COLUMNS = new QueryColumn[]{ID, GROUP_NAME, GROUP_SHOWN_NAME, DESCRIPTION, CREATE_TIME, OWNER, MEMBERS};
 
 
     public static final GroupsTableDef GROUPS = new GroupsTableDef();

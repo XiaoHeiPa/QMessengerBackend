@@ -32,6 +32,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
         group.setDescription("The default description. QvQ");
         group.setMembers(new HashSet<>());
         group.setName(name);
+        group.setShownName(name);
         if (this.hasGroup(group.getName())) {
             return false;
         }
