@@ -153,11 +153,12 @@ public class UserController {
         String name = request.getUserPrincipal().getName();
         Account user = accountService.findAccountByNameOrEmail(name);
         Integer id = user.getId();
-        File avatarFile = new File(CONFIG_DIR, "avatar/" + id + ".png");
+        File avatarFile = new File(CONFIG_DIR, "avatar/users/" + id + ".png");
         if (!avatarFile.exists()) {
             response.sendRedirect("https://http.cat/404.png");
             return;
         }
+        response.setHeader("Content-Type", "image/png");
         try (FileInputStream stream = new FileInputStream(avatarFile)) {
             IOUtils.copy(stream, response.getOutputStream());
         }
