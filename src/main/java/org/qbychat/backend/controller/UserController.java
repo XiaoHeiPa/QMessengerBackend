@@ -56,6 +56,12 @@ public class UserController {
         return RestBean.success(request.getUserPrincipal().getName());
     }
 
+    @GetMapping("/account")
+    public RestBean<Account> account(HttpServletRequest request) {
+        String name = request.getUserPrincipal().getName();
+        return RestBean.success(accountService.findAccountByNameOrEmail(name));
+    }
+
     @PostMapping("/register")
     public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) {
         if (accountService.findAccountByNameOrEmail(name) != null) {
