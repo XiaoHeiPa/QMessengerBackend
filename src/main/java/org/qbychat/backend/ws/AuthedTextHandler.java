@@ -38,8 +38,8 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
                 return;
             }
             log.info("User {} has connected to {}", account.getId(), this.getClass().getName());
-            AccountDTO authorizeVO = account.asViewObject(AccountDTO.class);
-            session.sendMessage(new TextMessage(Response.USER_INFO.setData(authorizeVO).toJson()));
+            AccountDTO accountDTO = account.asViewObject(AccountDTO.class);
+            session.sendMessage(new TextMessage(Response.USER_INFO.setData(accountDTO).toJson()));
         } else {
             session.sendMessage(new TextMessage(Response.builder().method(Response.USER_INFO.method).hasError(true).data("Please provide a correct token").build().toJson()));
             session.close();
