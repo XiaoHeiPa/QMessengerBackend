@@ -25,7 +25,7 @@ public class Account implements BaseData {
     private Integer id;
     private String username;
     private String email;
-    private String bio = "";
+    private String bio = "Default bio.";
     private String password;
     private String role;
     @Column(value = "registerTime")
