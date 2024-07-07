@@ -2,8 +2,12 @@ package org.qbychat.backend.controller;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
+import org.qbychat.backend.QMessengerBackendApplication;
 import org.qbychat.backend.entity.*;
 import org.qbychat.backend.entity.dto.FriendDTO;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
@@ -18,8 +22,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.util.*;
 
+import static org.qbychat.backend.QMessengerBackendApplication.CONFIG_DIR;
 import static org.qbychat.backend.utils.Const.ACCOUNT_VERIFY;
 
 @Log4j2
@@ -138,5 +146,20 @@ public class UserController {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         List<Group> groups = groupsService.queryJoinedGroups(user);
         return RestBean.success(groups);
+    }
+
+    @GetMapping("/avatar")
+    public void avatar(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws Exception{
+        String name = request.getUserPrincipal().getName();
+        Account user = accountService.findAccountByNameOrEmail(name);
+        Integer id = user.getId();
+        File avatarFile = new File(CONFIG_DIR, "avatar/" + id + ".png");
+        if (!avatarFile.exists()) {
+            response.sendRedirect("https://http.cat/404.png");
+            return;
+        }
+        try (FileInputStream stream = new FileInputStream(avatarFile)) {
+            IOUtils.copy(stream, response.getOutputStream());
+        }
     }
 }
