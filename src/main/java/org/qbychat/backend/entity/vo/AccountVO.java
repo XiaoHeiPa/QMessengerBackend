@@ -1,11 +1,11 @@
-package org.qbychat.backend.entity.dto;
+package org.qbychat.backend.entity.vo;
 
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class AccountDTO {
+public class AccountVO {
     private Integer id;
     private String username;
     private String email;
