@@ -29,7 +29,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
         Group group = new Group();
         group.setOwner(owner.getId());
         group.setCreateTime(new Date().getTime());
-        group.setDescription("The default description. QvQ");
+        group.setDescription("The default description. QMessenger Powered. QvQ");
         group.setMembers(new HashSet<>());
         group.setName(name);
         group.setShownName(name);
