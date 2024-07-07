@@ -15,7 +15,7 @@ import java.util.List;
 import static org.qbychat.backend.entity.table.FriendsTableDef.FRIENDS;
 
 /**
- *  服务层实现。
+ * 服务层实现。
  *
  * @author zszf
  * @since 2024-06-26
@@ -32,7 +32,13 @@ public class FriendsServiceImpl extends ServiceImpl<FriendsMapper, Friend> imple
                 .or(FRIENDS.USER2.eq(account.getId()));
         List<Friend> friends = this.mapper.selectListByQuery(qw);
         List<Account> accounts = new ArrayList<>();
-        friends.forEach(i -> accounts.add(accountService.findAccountById(i.getUser2())));
+        friends.forEach(friend -> {
+            if (friend.getUser1().equals(account.getId())) {
+                accounts.add(accountService.findAccountById(friend.getUser2()));
+            } else {
+                accounts.add(accountService.findAccountById(friend.getUser1()));
+            }
+        });
         return accounts;
     }
 
