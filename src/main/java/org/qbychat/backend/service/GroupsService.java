@@ -4,6 +4,8 @@ import com.mybatisflex.core.service.IService;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Group;
 
+import java.util.List;
+
 public interface GroupsService extends IService<Group> {
     boolean createGroup(Account owner, String name);
     boolean deleteGroup(Group group);
@@ -18,4 +20,6 @@ public interface GroupsService extends IService<Group> {
     boolean hasGroup(String name);
 
     boolean hasGroup(Integer id);
+
+    List<Group> queryJoinedGroups(Account user);
 }

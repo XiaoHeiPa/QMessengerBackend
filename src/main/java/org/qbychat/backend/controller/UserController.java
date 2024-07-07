@@ -4,13 +4,11 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
-import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.Email;
-import org.qbychat.backend.entity.RestBean;
-import org.qbychat.backend.entity.Roles;
+import org.qbychat.backend.entity.*;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
+import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +30,8 @@ public class UserController {
 
     @Resource
     private AccountServiceImpl accountService;
+    @Resource
+    private GroupsServiceImpl groupsService;
 
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
@@ -116,18 +116,24 @@ public class UserController {
     }
 
     @GetMapping("/friends/list")
-    public RestBean<List<String>> getFriends(@NotNull HttpServletRequest request) {
+    public RestBean<List<Integer>> getFriends(@NotNull HttpServletRequest request) {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        Account[] friends = friendsService.getFriendsWithAccount(user);
-        List<String> friendUserNames = new ArrayList<>();
+        List<Account> friends = friendsService.getFriendsWithAccount(user);
+        List<Integer> friendIds = new ArrayList<>();
         for (Account friend : friends) {
-            friendUserNames.add(friend.getUsername());
+            friendIds.add(friend.getId());
         }
-        return RestBean.success(friendUserNames);
+        return RestBean.success(friendIds);
     }
 
-//    @PostMapping("/friends/add")
-//    public RestBean<String> addFriend(@RequestParam("username") String username, HttpServletRequest request) {
-//
-//    }
+    @GetMapping("/groups/list")
+    public RestBean<List<Integer>> getGroups(@NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        List<Group> groups = groupsService.queryJoinedGroups(user);
+        List<Integer> groupIds = new ArrayList<>();
+        for (Group group : groups) {
+            groupIds.add(group.getId());
+        }
+        return RestBean.success(groupIds);
+    }
 }

@@ -25,7 +25,7 @@ public class FriendsServiceImpl extends ServiceImpl<FriendsMapper, Friend> imple
     @Resource
     private AccountServiceImpl accountService;
 
-    public Account[] getFriendsWithAccount(Account account) {
+    public List<Account> getFriendsWithAccount(Account account) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(FRIENDS.ALL_COLUMNS)
                 .where(FRIENDS.USER1.eq(account.getId()))
@@ -33,7 +33,7 @@ public class FriendsServiceImpl extends ServiceImpl<FriendsMapper, Friend> imple
         List<Friend> friends = this.mapper.selectListByQuery(qw);
         List<Account> accounts = new ArrayList<>();
         friends.forEach(i -> accounts.add(accountService.findAccountById(i.getUser2())));
-        return accounts.toArray(new Account[0]);
+        return accounts;
     }
 
     public void addFriend(Account user1, Account user2) {

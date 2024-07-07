@@ -10,8 +10,10 @@ import org.qbychat.backend.mapper.GroupMapper;
 import org.qbychat.backend.service.GroupsService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.qbychat.backend.entity.table.GroupsTableDef.GROUPS;
 
@@ -82,5 +84,17 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
     @Override
     public boolean hasGroup(Integer id) {
         return this.getGroupById(id) != null;
+    }
+
+    @Override
+    public List<Group> queryJoinedGroups(Account user) {
+        List<Group> groups = this.mapper.selectAll();
+        List<Group> result = new ArrayList<>();
+        for (Group group : groups) {
+            if (group.getMembers().contains(user.getId())) {
+                result.add(group);
+            }
+        }
+        return result;
     }
 }
