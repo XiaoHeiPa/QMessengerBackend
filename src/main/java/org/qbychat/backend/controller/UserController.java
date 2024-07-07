@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.*;
+import org.qbychat.backend.entity.dto.FriendDTO;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
@@ -116,14 +117,14 @@ public class UserController {
     }
 
     @GetMapping("/friends/list")
-    public RestBean<List<Integer>> getFriends(@NotNull HttpServletRequest request) {
+    public RestBean<List<FriendDTO>> getFriends(@NotNull HttpServletRequest request) {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         List<Account> friends = friendsService.getFriendsWithAccount(user);
-        List<Integer> friendIds = new ArrayList<>();
+        List<FriendDTO> friendDTOs = new ArrayList<>();
         for (Account friend : friends) {
-            friendIds.add(friend.getId());
+            friendDTOs.add(new FriendDTO(friend.getId(), friend.getUsername(), friend.getNickname()));
         }
-        return RestBean.success(friendIds);
+        return RestBean.success(friendDTOs);
     }
 
     @GetMapping("/groups/list")
