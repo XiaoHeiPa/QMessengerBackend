@@ -154,6 +154,7 @@ public class UserController {
         Account user = accountService.findAccountByNameOrEmail(name);
         Integer id = user.getId();
         File avatarFile = new File(CONFIG_DIR, "avatar/users/" + id + ".png");
+        log.info("Get avatar {}", id);
         if (!avatarFile.exists()) {
             response.sendRedirect("https://http.cat/404.png");
             return;
