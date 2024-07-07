@@ -127,13 +127,9 @@ public class UserController {
     }
 
     @GetMapping("/groups/list")
-    public RestBean<List<Integer>> getGroups(@NotNull HttpServletRequest request) {
+    public RestBean<List<Group>> getGroups(@NotNull HttpServletRequest request) {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         List<Group> groups = groupsService.queryJoinedGroups(user);
-        List<Integer> groupIds = new ArrayList<>();
-        for (Group group : groups) {
-            groupIds.add(group.getId());
-        }
-        return RestBean.success(groupIds);
+        return RestBean.success(groups);
     }
 }
