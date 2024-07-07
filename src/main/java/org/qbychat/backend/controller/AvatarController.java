@@ -17,8 +17,8 @@ import static org.qbychat.backend.QMessengerBackendApplication.CONFIG_DIR;
 @RequestMapping("/avatar")
 public class AvatarController {
     @GetMapping("query")
-    public void query(HttpServletRequest request, HttpServletResponse response, @RequestBody Integer id, @RequestBody Boolean isUser) throws Exception {
-        File avatarFile = new File(CONFIG_DIR, "avatar/" + (isUser ? "users" : "groups") + "/" + id + ".png");
+    public void query(HttpServletRequest request, HttpServletResponse response, @RequestBody Integer id, @RequestBody int isUser) throws Exception {
+        File avatarFile = new File(CONFIG_DIR, "avatar/" + (isUser == 1 ? "users" : "groups") + "/" + id + ".png");
         if (!avatarFile.exists()) {
             response.sendRedirect("https://http.cat/404.png");
             return;
