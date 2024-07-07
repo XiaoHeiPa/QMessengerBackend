@@ -55,7 +55,7 @@ public class AdminController {
         account.setUsername(username);
         account.setPassword(passwordEncoder.encode(password));
         account.setEmail(email);
-        account.setRegisterTime(new Date());
+        account.setRegisterTime(new Date().getTime());
         account.setRole(Objects.requireNonNullElse(role, Roles.USER).name());
         if (nickname != null) {
             account.setNickname(nickname);

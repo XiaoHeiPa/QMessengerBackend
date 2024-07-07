@@ -29,7 +29,7 @@ public class Account implements BaseData {
     private String password;
     private String role;
     @Column(value = "registerTime")
-    private Date registerTime;
+    private long registerTime;
     private String nickname;
     @Column(value = "state")
     private boolean active = true;

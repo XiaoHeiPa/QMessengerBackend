@@ -10,5 +10,5 @@ public class AuthorizeVO {
     String role;
     String token;
     String email;
-    Date expire;
+    long expire;
 }

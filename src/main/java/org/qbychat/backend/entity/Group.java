@@ -23,7 +23,7 @@ public class Group {
     private String name;
     private String shownName;
     private String description;
-    private Date createTime;
+    private long createTime;
     @Column(typeHandler = Fastjson2TypeHandler.class)
     private Set<Integer> members;
 }

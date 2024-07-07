@@ -69,7 +69,7 @@ public class UserController {
         newAccount.setEmail(email);
         newAccount.setPassword(passwordEncoder.encode(password));
         newAccount.setNickname(name);
-        newAccount.setRegisterTime(new Date());
+        newAccount.setRegisterTime(new Date().getTime());
         UUID newAccountUuid = UUID.randomUUID();
         redisTemplate.opsForValue().set(ACCOUNT_VERIFY + newAccountUuid, newAccount);
         Email verifyEmail = new Email();

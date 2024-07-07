@@ -10,6 +10,6 @@ public class AccountVO {
     private String username;
     private String email;
     private String role;
-    private Date registerTime;
+    private Integer registerTime;
     private String nickname;
 }

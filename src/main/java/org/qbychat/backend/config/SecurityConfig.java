@@ -121,7 +121,7 @@ public class SecurityConfig {
         Account account = accountService.findAccountByNameOrEmail(user.getUsername());
         String token = jwtUtils.createJwt(user, 1, account.getUsername());
         AuthorizeVO authorizeVO = account.asViewObject(AuthorizeVO.class, authorizeVO1 -> {
-            authorizeVO1.setExpire(jwtUtils.getExpireDate());
+            authorizeVO1.setExpire(jwtUtils.getExpireDate().getTime());
             authorizeVO1.setToken(token);
         });
         response.getWriter().write(RestBean.success(authorizeVO).toJson());
