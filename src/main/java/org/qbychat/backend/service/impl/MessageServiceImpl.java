@@ -54,20 +54,18 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Override
     public List<Message> fetchLatestDirectMessages(int user1, int user2) {
-        List<Message> records;
+        List<Message> records  = new ArrayList<>();
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.SENDER.eq(user1))
                 .and(MESSAGES.TO.eq(user2))
                 .and(MESSAGES.IS_DM.eq(true));
         int total = this.mapper.selectListByQuery(qw).size();
-        if (total == 0) {
-            return List.of();
-        } else {
-            records = new ArrayList<>(this.mapper.paginate(total, pageSize, qw).getRecords());
+        if (total / pageSize < 1) {
+            records.addAll(this.mapper.paginate(1, pageSize, qw).getRecords());
         }
-        if (total > 1) {
-            records.addAll(this.mapper.paginate(total - 1, pageSize, qw).getRecords());
+        if (total / pageSize > 1) {
+            records.addAll(this.mapper.paginate(total / pageSize, pageSize, qw).getRecords());
         }
         QueryWrapper qw1 = new QueryWrapper();
         qw1.select(MESSAGES.ALL_COLUMNS)
@@ -75,11 +73,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 .and(MESSAGES.TO.eq(user1))
                 .and(MESSAGES.IS_DM.eq(true));
         int total1 = this.mapper.selectListByQuery(qw1).size();
-        if (total1 != 0) {
-            records.addAll(this.mapper.paginate(total1, pageSize, qw1).getRecords());
+        if (total1 / pageSize < 1) {
+            records.addAll(this.mapper.paginate(1, pageSize, qw1).getRecords());
         }
-        if (total > 1) {
-            records.addAll(this.mapper.paginate(total - 1, pageSize, qw1).getRecords());
+        if (total1 / pageSize > 1) {
+            records.addAll(this.mapper.paginate(total1 / pageSize, pageSize, qw1).getRecords());
         }
         return records;
     }
