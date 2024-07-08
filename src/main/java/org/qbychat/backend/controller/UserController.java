@@ -70,6 +70,15 @@ public class UserController {
         return RestBean.success(accountService.findAccountByNameOrEmail(name));
     }
 
+    @GetMapping("/query")
+    public RestBean<Account> query(@RequestParam Integer id) {
+        Account account = accountService.findAccountById(id);
+        if (account == null) {
+            return RestBean.failure(404, "Account not found");
+        }
+        return RestBean.success(account);
+    }
+
     @PostMapping("/register")
     public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) {
         if (accountService.findAccountByNameOrEmail(name) != null) {

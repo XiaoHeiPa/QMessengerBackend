@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 .requestMatchers("/user/register").anonymous()
                                 .requestMatchers("/user/apply-register").anonymous()
                                 .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/user/query").permitAll()
                                 .requestMatchers("/find-device/**").authenticated()
                                 .requestMatchers("/group/**").authenticated()
                                 .requestMatchers("/ws/**").permitAll()
