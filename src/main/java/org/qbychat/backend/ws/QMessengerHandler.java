@@ -115,7 +115,7 @@ public class QMessengerHandler extends AuthedTextHandler {
         }
     }
 
-    private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account account) throws IOException, FirebaseMessagingException {
+    private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account sender) throws IOException, FirebaseMessagingException {
         FirebaseMessaging firebaseMessaging;
         session.sendMessage(new TextMessage(msgResponse.toJson()));
         WebSocketSession targetSession = connections.get(to);
@@ -124,12 +124,13 @@ public class QMessengerHandler extends AuthedTextHandler {
         }
         firebaseMessaging = app.getBean("firebaseMessaging");
         String targetFCMToken = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + to);
+        if (targetFCMToken == null || (chatMessage.isDirectMessage() && sender.getId() == to)) return;
         firebaseMessaging.send(
                 Message.builder()
                         .setToken(targetFCMToken)
                         .setNotification(
                                 Notification.builder()
-                                        .setTitle(account.getNickname())
+                                        .setTitle(sender.getNickname())
                                         .setBody(chatMessage.getContent().getText())
                                         .build()
                         )
