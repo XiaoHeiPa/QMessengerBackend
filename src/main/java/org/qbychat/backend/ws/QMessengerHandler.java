@@ -1,18 +1,19 @@
 package org.qbychat.backend.ws;
 
 import com.alibaba.fastjson2.JSON;
+import com.google.firebase.messaging.FirebaseMessaging;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Group;
-import org.qbychat.backend.entity.Message;
+import org.qbychat.backend.entity.ChatMessage;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.service.impl.MessageServiceImpl;
+import org.qbychat.backend.utils.QMsgAppContextAware;
 import org.qbychat.backend.ws.entity.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -32,6 +33,9 @@ public class QMessengerHandler extends AuthedTextHandler {
     @Resource
     MessageServiceImpl messageService;
 
+    @Resource
+    QMsgAppContextAware app;
+
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
     @Override
@@ -48,7 +52,7 @@ public class QMessengerHandler extends AuthedTextHandler {
 
         switch (method) {
             case RequestType.SEND_MESSAGE -> {
-                Message chatMessage = JSON.parseObject(request.getDataJson(), Message.class);
+                ChatMessage chatMessage = JSON.parseObject(request.getDataJson(), ChatMessage.class);
                 // send message
                 // 找到目标并发送
                 chatMessage.setSender(account.getId());
@@ -69,7 +73,10 @@ public class QMessengerHandler extends AuthedTextHandler {
                             targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
                         }
                         // send via fcm
-
+                        FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");
+//                        firebaseMessaging.send(
+//                                com.google.firebase.messaging.Message.builder().build()
+//                        )
                     }
                 }
             }
@@ -93,7 +100,7 @@ public class QMessengerHandler extends AuthedTextHandler {
             }
             case RequestType.FETCH_LATEST_MESSAGES -> {
                 RequestFetchLatestMessages data = JSON.parseObject(request.getDataJson(), RequestFetchLatestMessages.class);
-                List<Message> messages;
+                List<ChatMessage> messages;
                 int channel = data.getChannel();
                 if (data.isDirectMessage()) {
                     messages = messageService.fetchLatestDirectMessages(channel, account.getId());
@@ -105,7 +112,7 @@ public class QMessengerHandler extends AuthedTextHandler {
                         messages = List.of();
                     }
                 }
-                for (Message chatMessage : messages) {
+                for (ChatMessage chatMessage : messages) {
                     session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
                 }
             }

@@ -2,7 +2,7 @@ package org.qbychat.backend.service.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
-import org.qbychat.backend.entity.Message;
+import org.qbychat.backend.entity.ChatMessage;
 import org.qbychat.backend.mapper.MessageMapper;
 import org.qbychat.backend.service.MessageService;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,17 +14,17 @@ import java.util.List;
 import static org.qbychat.backend.entity.table.MessagesTableDef.MESSAGES;
 
 @Service
-public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements MessageService {
+public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> implements MessageService {
     @Value("${messenger.message.page.size}")
     private int pageSize;
 
     @Override
-    public void addMessage(Message message) {
+    public void addMessage(ChatMessage message) {
         this.mapper.insert(message);
     }
 
     @Override
-    public void removeMessage(Message message) {
+    public void removeMessage(ChatMessage message) {
         this.mapper.delete(message);
     }
 
@@ -34,13 +34,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<Message> fetchLatestGroupMessages(int channel) {
+    public List<ChatMessage> fetchLatestGroupMessages(int channel) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.TO.eq(channel))
                 .and(MESSAGES.IS_DM.eq(false));
         int total = this.mapper.selectListByQuery(qw).size();
-        List<Message> records;
+        List<ChatMessage> records;
         if (total == 0) {
             return List.of();
         } else {
@@ -53,8 +53,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<Message> fetchLatestDirectMessages(int user1, int user2) {
-        List<Message> records  = new ArrayList<>();
+    public List<ChatMessage> fetchLatestDirectMessages(int user1, int user2) {
+        List<ChatMessage> records  = new ArrayList<>();
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.SENDER.eq(user1))
@@ -83,7 +83,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<Message> fetchGroupMessages(int channel, int page) {
+    public List<ChatMessage> fetchGroupMessages(int channel, int page) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.TO.eq(channel))
@@ -93,14 +93,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<Message> fetchDirectMessages(int user1, int user2, int page) {
+    public List<ChatMessage> fetchDirectMessages(int user1, int user2, int page) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.SENDER.eq(user1))
                 .and(MESSAGES.TO.eq(user2))
                 .and(MESSAGES.IS_DM.eq(true));
         int total = this.mapper.selectListByQuery(qw).size();
-        List<Message> records = new ArrayList<>(this.mapper.paginate(total, pageSize, qw).getRecords());
+        List<ChatMessage> records = new ArrayList<>(this.mapper.paginate(total, pageSize, qw).getRecords());
         
         QueryWrapper qw1 = new QueryWrapper();
         qw1.select(MESSAGES.ALL_COLUMNS)
@@ -114,12 +114,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
-    public List<Message> fetchMessages(int channel, boolean isDM, Message since) {
+    public List<ChatMessage> fetchMessages(int channel, boolean isDM, ChatMessage since) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.TO.eq(channel))
                 .and(MESSAGES.IS_DM.eq(isDM));
-        List<Message> chatMessages = this.mapper.selectListByQuery(qw);
+        List<ChatMessage> chatMessages = this.mapper.selectListByQuery(qw);
         int pos = chatMessages.indexOf(since);
         int atPage = pos / pageSize + 1;
         return this.mapper.paginate(atPage, pageSize, qw).getRecords();

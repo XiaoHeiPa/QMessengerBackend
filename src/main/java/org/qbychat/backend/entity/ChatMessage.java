@@ -8,7 +8,6 @@ import com.mybatisflex.core.handler.Fastjson2TypeHandler;
 import lombok.*;
 import org.qbychat.backend.ws.entity.Response;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 
 import java.util.Calendar;
 
@@ -18,7 +17,7 @@ import java.util.Calendar;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(value = "db_messages")
-public class Message implements BaseData {
+public class ChatMessage implements BaseData {
     @Id(keyType = KeyType.Auto)
     private Integer id;
 
