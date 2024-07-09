@@ -14,6 +14,7 @@ import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
+import org.qbychat.backend.utils.Const;
 import org.qbychat.backend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,9 @@ import static org.qbychat.backend.utils.Const.ACCOUNT_VERIFY;
 public class UserController {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private RedisTemplate<String, String> stringRedisTemplate;
 
     @Resource
     private AccountServiceImpl accountService;
@@ -172,5 +176,21 @@ public class UserController {
         try (FileInputStream stream = new FileInputStream(avatarFile)) {
             IOUtils.copy(stream, response.getOutputStream());
         }
+    }
+
+    @PostMapping("/fcm/token")
+    public RestBean<String> updateFCMToken(@RequestParam("newToken") String token, HttpServletRequest request) {
+        String username = request.getUserPrincipal().getName();
+        Account user = accountService.findAccountByNameOrEmail(username);
+        stringRedisTemplate.opsForValue().set(Const.FCM_TOKEN + user.getId(), token);
+        return RestBean.success("Token updated.");
+    }
+
+    @GetMapping("/fcm/token")
+    public RestBean<String> getFCMToken(HttpServletRequest request) {
+        String username = request.getUserPrincipal().getName();
+        Account user = accountService.findAccountByNameOrEmail(username);
+        String token = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + user.getId());
+        return RestBean.success(token);
     }
 }

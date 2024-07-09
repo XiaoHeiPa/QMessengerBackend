@@ -68,6 +68,8 @@ public class QMessengerHandler extends AuthedTextHandler {
                         if (targetSession != null) {
                             targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
                         }
+                        // send via fcm
+
                     }
                 }
             }

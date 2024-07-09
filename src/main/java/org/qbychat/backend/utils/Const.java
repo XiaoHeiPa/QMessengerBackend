@@ -5,6 +5,7 @@ public interface Const {
     String JWT_BLACKLIST = "qbychat:jwt:bl:";
     String ACCOUNT_VERIFY = "qbychat:account:verify:";
     String CACHED_MESSAGE = "qbychat:cache:";
+    String FCM_TOKEN = "qbychat:fcm:token:";
 
     // Device Finder
     String DEVICE_LOCATION = "find-device:location:";
