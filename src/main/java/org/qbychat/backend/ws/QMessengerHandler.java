@@ -1,7 +1,7 @@
 package org.qbychat.backend.ws;
 
 import com.alibaba.fastjson2.JSON;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.*;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
@@ -12,12 +12,16 @@ import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.service.impl.MessageServiceImpl;
+import org.qbychat.backend.utils.Const;
 import org.qbychat.backend.utils.QMsgAppContextAware;
 import org.qbychat.backend.ws.entity.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +36,9 @@ public class QMessengerHandler extends AuthedTextHandler {
     GroupsServiceImpl groupsService;
     @Resource
     MessageServiceImpl messageService;
+
+    @Resource
+    private RedisTemplate<String, String> stringRedisTemplate;
 
     @Resource
     QMsgAppContextAware app;
@@ -59,24 +66,13 @@ public class QMessengerHandler extends AuthedTextHandler {
                 Response msgResponse = chatMessage.toResponse();
                 messageService.addMessage(chatMessage);
                 // direct message
+                FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");
                 if (chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
-                    session.sendMessage(new TextMessage(msgResponse.toJson()));
-                    WebSocketSession targetSession = connections.get(chatMessage.getTo());
-                    if (targetSession != null) {
-                        targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
-                    }
+                    sendMessage(session, msgResponse, chatMessage.getTo(), chatMessage, account);
                 } else if (!chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
                     Group group = groupsService.getGroupById(chatMessage.getTo());
                     for (Integer memberId : group.getMembers()) {
-                        WebSocketSession targetSession = connections.get(memberId);
-                        if (targetSession != null) {
-                            targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
-                        }
-                        // send via fcm
-                        FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");
-//                        firebaseMessaging.send(
-//                                com.google.firebase.messaging.Message.builder().build()
-//                        )
+                        sendMessage(session, msgResponse, memberId, chatMessage, account);
                     }
                 }
             }
@@ -117,6 +113,28 @@ public class QMessengerHandler extends AuthedTextHandler {
                 }
             }
         }
+    }
+
+    private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account account) throws IOException, FirebaseMessagingException {
+        FirebaseMessaging firebaseMessaging;
+        session.sendMessage(new TextMessage(msgResponse.toJson()));
+        WebSocketSession targetSession = connections.get(to);
+        if (targetSession != null) {
+            targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
+        }
+        firebaseMessaging = app.getBean("firebaseMessaging");
+        String targetFCMToken = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + to);
+        firebaseMessaging.send(
+                Message.builder()
+                        .setToken(targetFCMToken)
+                        .setNotification(
+                                Notification.builder()
+                                        .setTitle(account.getNickname())
+                                        .setBody(chatMessage.getContent().getText())
+                                        .build()
+                        )
+                        .build()
+        );
     }
 
     @Override

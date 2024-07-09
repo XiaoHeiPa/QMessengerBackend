@@ -49,7 +49,7 @@ public class ChatMessage implements BaseData {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    static class MessageContent {
+    public static class MessageContent {
         @Builder.Default
         String description = null;
         String text;
