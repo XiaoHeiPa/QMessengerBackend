@@ -40,14 +40,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
                 .where(MESSAGES.TO.eq(channel))
                 .and(MESSAGES.IS_DM.eq(false));
         int total = this.mapper.selectListByQuery(qw).size();
-        List<ChatMessage> records;
-        if (total == 0) {
-            return List.of();
-        } else {
-            records = new ArrayList<>(this.mapper.paginate(total, pageSize, qw).getRecords());
+        List<ChatMessage> records = new ArrayList<>();
+        if (total / pageSize < 1) {
+            records.addAll(this.mapper.paginate(1, pageSize, qw).getRecords());
         }
-        if (total > 1) {
-            records.addAll(this.mapper.paginate(total - 1, pageSize, qw).getRecords());
+        if (total / pageSize > 1) {
+            records.addAll(this.mapper.paginate(total / pageSize, pageSize, qw).getRecords());
         }
         return records;
     }
