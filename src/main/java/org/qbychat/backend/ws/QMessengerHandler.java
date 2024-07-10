@@ -109,14 +109,16 @@ public class QMessengerHandler extends AuthedTextHandler {
                     }
                 }
                 for (ChatMessage chatMessage : messages) {
+                    chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
                     session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
                 }
             }
         }
     }
 
-    private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account sender) throws IOException, FirebaseMessagingException {
+    private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account account) throws IOException, FirebaseMessagingException {
         FirebaseMessaging firebaseMessaging;
+        chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
         session.sendMessage(new TextMessage(msgResponse.toJson()));
         WebSocketSession targetSession = connections.get(to);
         if (targetSession != null) {
@@ -124,13 +126,12 @@ public class QMessengerHandler extends AuthedTextHandler {
         }
         firebaseMessaging = app.getBean("firebaseMessaging");
         String targetFCMToken = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + to);
-        if (targetFCMToken == null || (chatMessage.isDirectMessage() && sender.getId() == to)) return;
         firebaseMessaging.send(
                 Message.builder()
                         .setToken(targetFCMToken)
                         .setNotification(
                                 Notification.builder()
-                                        .setTitle(sender.getNickname())
+                                        .setTitle(account.getNickname())
                                         .setBody(chatMessage.getContent().getText())
                                         .build()
                         )

@@ -22,6 +22,7 @@ public class ChatMessage implements BaseData {
     private Integer id;
 
     private Integer sender;
+    private Account senderInfo;
     private Integer to;
     private MessageType type = MessageType.TEXT;
     @Column(value = "is_dm")
