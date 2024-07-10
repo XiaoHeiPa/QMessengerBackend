@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 import static org.qbychat.backend.QMessengerBackendApplication.CONFIG_DIR;
 
@@ -17,7 +18,10 @@ public class AvatarController {
     public void query(HttpServletRequest request, HttpServletResponse response, @RequestParam Integer id, @RequestParam int isUser) throws Exception {
         File avatarFile = new File(CONFIG_DIR, "avatar/" + (isUser == 1 ? "users" : "groups") + "/" + id + ".png");
         if (!avatarFile.exists()) {
-            response.sendRedirect("https://http.cat/404.png");
+            try (InputStream stream = getClass().getResourceAsStream("/default-avatar.png")) {
+                assert stream != null;
+                IOUtils.copy(stream, response.getOutputStream());
+            }
             return;
         }
         response.setHeader("Content-Type", "image/png");
