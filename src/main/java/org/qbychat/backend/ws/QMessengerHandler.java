@@ -126,6 +126,7 @@ public class QMessengerHandler extends AuthedTextHandler {
         }
         firebaseMessaging = app.getBean("firebaseMessaging");
         String targetFCMToken = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + to);
+        if (targetFCMToken == null) return;
         firebaseMessaging.send(
                 Message.builder()
                         .setToken(targetFCMToken)
