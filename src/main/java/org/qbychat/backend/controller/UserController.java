@@ -86,10 +86,17 @@ public class UserController {
     }
 
     @PostMapping("/account/nickname")
-    public RestBean<String> changeNickname(@RequestParam("nickname") String nickname, @NotNull HttpServletRequest request) {
+    public RestBean<String> changeNickname(@RequestParam("value") String nickname, @NotNull HttpServletRequest request) {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         accountService.updateNickname(user, nickname);
         return RestBean.success("Nickname changed.");
+    }
+
+    @PostMapping("/account/bio")
+    public RestBean<String> changeBio(@RequestParam("value") String bio, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        accountService.updateBio(user, bio);
+        return RestBean.success("Bio changed.");
     }
 
     @PostMapping("/account/password")

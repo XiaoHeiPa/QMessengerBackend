@@ -28,4 +28,5 @@ public interface AccountService extends IService<Account>, UserDetailsService {
     boolean hasUser(Integer id);
 
 
+    void updateBio(Account account, String bio);
 }

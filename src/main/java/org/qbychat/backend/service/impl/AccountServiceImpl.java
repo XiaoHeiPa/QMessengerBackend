@@ -77,6 +77,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
+    public void updateBio(Account account, String bio) {
+        Account newAccount = UpdateEntity.of(Account.class, account.getId());
+        newAccount.setBio(bio);
+        this.updateUser(newAccount);
+    }
+
+    @Override
     public void updateUser(Account account) {
         this.mapper.update(account);
     }
