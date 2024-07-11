@@ -18,6 +18,15 @@ public class GroupController {
     private AccountServiceImpl accountService;
 
     @GetMapping("query")
+    public RestBean<Group> query(@RequestParam int id) {
+        Group group = groupsService.getGroupById(id);
+        if (group == null) {
+            return RestBean.failure(404, "Group not found");
+        }
+        return RestBean.success(group);
+    }
+
+    @GetMapping("query")
     public RestBean<Group> query(@RequestParam String name) {
         Group group = groupsService.getGroupByName(name);
         if (group == null) {
