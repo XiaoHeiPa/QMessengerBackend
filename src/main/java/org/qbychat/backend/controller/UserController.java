@@ -4,10 +4,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
-import org.qbychat.backend.QMessengerBackendApplication;
 import org.qbychat.backend.entity.*;
 import org.qbychat.backend.entity.dto.FriendDTO;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.util.*;
 
 import static org.qbychat.backend.QMessengerBackendApplication.CONFIG_DIR;
@@ -72,6 +69,38 @@ public class UserController {
     public RestBean<Account> account(HttpServletRequest request) {
         String name = request.getUserPrincipal().getName();
         return RestBean.success(accountService.findAccountByNameOrEmail(name));
+    }
+
+    @PostMapping("/account/username")
+    public RestBean<String> changeUsername(@RequestParam("value") String username, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        if (accountService.findAccountByNameOrEmail(username) != null || groupsService.hasGroup(username)) {
+            return RestBean.failure(409, "Username was taken.");
+        }
+        accountService.updateUsername(user, username);
+        // logout current client
+        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
+            return RestBean.success("Username changed.");
+        }
+        return RestBean.failure(500, "username changed, but failed to logout.");
+    }
+
+    @PostMapping("/account/nickname")
+    public RestBean<String> changeNickname(@RequestParam("nickname") String nickname, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        accountService.updateNickname(user, nickname);
+        return RestBean.success("Nickname changed.");
+    }
+
+    @PostMapping("/account/password")
+    public RestBean<String> changePassword(@RequestParam("value") String password, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        accountService.updatePassword(user, passwordEncoder.encode(password));
+        // logout current client
+        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
+            return RestBean.success("Password changed.");
+        }
+        return RestBean.failure(500, "Password changed, but failed to logout.");
     }
 
     @GetMapping("/query")
@@ -130,17 +159,6 @@ public class UserController {
             log.warn("Someone try to register with uuid: {} but it's not exits.", uuid);
             return RestBean.failure(401, "uuid not found!");
         }
-    }
-
-    @PostMapping("/update-password")
-    public RestBean<String> changePassword(@RequestParam("password") String password, @NotNull HttpServletRequest request) {
-        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        accountService.updatePassword(user, passwordEncoder.encode(password));
-        // logout current client
-        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
-            return RestBean.success("Password changed.");
-        }
-        return RestBean.failure(500, "Password changed, but failed to logout.");
     }
 
     @GetMapping("/friends/list")

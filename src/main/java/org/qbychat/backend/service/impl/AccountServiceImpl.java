@@ -55,9 +55,24 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         this.updateUser(newAccount);
     }
 
+    @Override
     public void updatePassword(Account account, String password) {
         Account newAccount = UpdateEntity.of(Account.class, account.getId());
         newAccount.setPassword(password);
+        this.updateUser(newAccount);
+    }
+
+    @Override
+    public void updateUsername(Account account, String username) {
+        Account newAccount = UpdateEntity.of(Account.class, account.getId());
+        newAccount.setUsername(username);
+        this.updateUser(newAccount);
+    }
+
+    @Override
+    public void updateNickname(Account account, String nickname) {
+        Account newAccount = UpdateEntity.of(Account.class, account.getId());
+        newAccount.setNickname(nickname);
         this.updateUser(newAccount);
     }
 

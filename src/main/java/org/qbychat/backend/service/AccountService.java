@@ -17,10 +17,15 @@ public interface AccountService extends IService<Account>, UserDetailsService {
 
     void updateRole(Account account, Roles roles);
     void updatePassword(Account account, String password);
+    void updateUsername(Account user, String username);
+
+    void updateNickname(Account account, String nickname);
 
     void updateUser(Account account);
 
     boolean hasUser(String name);
 
     boolean hasUser(Integer id);
+
+
 }
