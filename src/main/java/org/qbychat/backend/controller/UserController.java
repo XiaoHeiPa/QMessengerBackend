@@ -103,8 +103,8 @@ public class UserController {
         return RestBean.failure(500, "Password changed, but failed to logout.");
     }
 
-    @GetMapping("/query")
-    public RestBean<Account> query(@RequestParam Integer id) {
+    @GetMapping("/query/id/{id}")
+    public RestBean<Account> query(@PathVariable Integer id) {
         Account account = accountService.findAccountById(id);
         if (account == null) {
             return RestBean.failure(404, "Account not found");

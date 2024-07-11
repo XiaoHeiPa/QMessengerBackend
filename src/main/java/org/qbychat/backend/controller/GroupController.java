@@ -2,6 +2,7 @@ package org.qbychat.backend.controller;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.PathParam;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Group;
 import org.qbychat.backend.entity.RestBean;
@@ -17,8 +18,17 @@ public class GroupController {
     @Resource
     private AccountServiceImpl accountService;
 
-    @GetMapping("query")
-    public RestBean<Group> query(@RequestParam String name) {
+    @GetMapping("query/id/{id}")
+    public RestBean<Group> queryById(@PathVariable("id") int id) {
+        Group group = groupsService.getGroupById(id);
+        if (group == null) {
+            return RestBean.failure(404, "Group not found");
+        }
+        return RestBean.success(group);
+    }
+
+    @GetMapping("query/name/{name}")
+    public RestBean<Group> query(@PathVariable String name) {
         Group group = groupsService.getGroupByName(name);
         if (group == null) {
             return RestBean.failure(404, "Group not found");
