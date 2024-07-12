@@ -35,3 +35,7 @@ messenger:
   message:
     page:
       size: 100
+  registration:
+    allow: false
+    invitation:
+      expire: 7

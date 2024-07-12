@@ -4,15 +4,20 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.Invitation;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.Roles;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
+import org.qbychat.backend.utils.Const;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @Log4j2
 @RestController
@@ -24,6 +29,10 @@ public class AdminController {
     private BCryptPasswordEncoder passwordEncoder;
     @Resource
     GroupsServiceImpl groupsService;
+    @Resource
+    RedisTemplate<String, Integer> invitationRedisTemplate;
+    @Value("${messenger.registration.invitation.expire}")
+    private int invitationExpire;
 
     @GetMapping("/ping")
     public String ping() {
@@ -38,6 +47,17 @@ public class AdminController {
         Account account = accountService.findAccountByNameOrEmail(username);
         accountService.updateRole(account, role);
         return RestBean.success();
+    }
+
+    @GetMapping("/register/invite")
+    public RestBean<Invitation> generateInviteCode(HttpServletRequest request) {
+        Account admin = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        UUID uuid = UUID.randomUUID();
+        Invitation invitation = new Invitation();
+        invitation.setId(uuid.toString());
+        invitation.setExpire(new Date().getTime() + ((long) invitationExpire * 24 * 60 * 60));
+        invitationRedisTemplate.opsForValue().set(Const.INVITATION + uuid, admin.getId());
+        return RestBean.success(invitation);
     }
 
     /**

@@ -55,6 +55,8 @@ public class UserController {
 
     @Value("${messenger.verify.email-verify-url}")
     String verifyUrl;
+    @Value("${messenger.registration.allow}")
+    private boolean allowRegister;
 
     @Resource
     @Qualifier("jwtDecoder")
@@ -121,6 +123,7 @@ public class UserController {
 
     @PostMapping("/register")
     public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) {
+        if (!allowRegister) return RestBean.failure(405, "Register is not allowed at this moment :(");
         if (accountService.findAccountByNameOrEmail(name) != null) {
             return RestBean.failure(401, "User exist.");
         }
