@@ -30,7 +30,7 @@ public class AdminController {
     @Resource
     GroupsServiceImpl groupsService;
     @Resource
-    RedisTemplate<String, Integer> invitationRedisTemplate;
+    RedisTemplate<String, Invitation> invitationRedisTemplate;
     @Value("${messenger.registration.invitation.expire}")
     private int invitationExpire;
 
@@ -54,9 +54,10 @@ public class AdminController {
         Account admin = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         UUID uuid = UUID.randomUUID();
         Invitation invitation = new Invitation();
-        invitation.setId(uuid.toString());
+        invitation.setAdminId(admin.getId());
+        invitation.setCode(uuid.toString());
         invitation.setExpire(new Date().getTime() + ((long) invitationExpire * 24 * 60 * 60));
-        invitationRedisTemplate.opsForValue().set(Const.INVITATION + uuid, admin.getId());
+        invitationRedisTemplate.opsForValue().set(Const.INVITATION + uuid, invitation);
         return RestBean.success(invitation);
     }
 

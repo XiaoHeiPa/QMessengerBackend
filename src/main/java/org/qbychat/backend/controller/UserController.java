@@ -47,6 +47,8 @@ public class UserController {
     private BCryptPasswordEncoder passwordEncoder;
     @Resource
     private FriendsServiceImpl friendsService;
+    @Resource
+    RedisTemplate<String, Invitation> invitationRedisTemplate;
 
     @Resource
     private JwtUtils jwtUtils;
@@ -119,6 +121,24 @@ public class UserController {
             return RestBean.failure(404, "Account not found");
         }
         return RestBean.success(account);
+    }
+
+    @GetMapping("/register/{code}")
+    public RestBean<Invitation> inviteCodeInfo(@PathVariable("code") String code, HttpServletRequest request) {
+        Invitation invitation = invitationRedisTemplate.opsForValue().get(Const.INVITATION + code);
+        if (invitation == null) {
+            return RestBean.failure(404, "Invite code expired or not found.");
+        }
+        return RestBean.success(invitation);
+    }
+
+    @PostMapping("/register/{code}")
+    public RestBean<String> register(@PathVariable("code") String code, @RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password, HttpServletRequest request) {
+        if (invitationRedisTemplate.opsForValue().getAndDelete(Const.INVITATION + code) == null) {
+            RestBean.failure(404, "Invite code expired or not found.");
+        }
+        // todo
+        return RestBean.success();
     }
 
     @PostMapping("/register")

@@ -52,6 +52,7 @@ public class SecurityConfig {
                         conf -> conf
                                 .requestMatchers("/user/login").anonymous()
                                 .requestMatchers("/user/register").anonymous()
+                                .requestMatchers("/user/register/*").anonymous()
                                 .requestMatchers("/user/apply-register").anonymous()
                                 .requestMatchers("/group/query/**").permitAll()
                                 .requestMatchers("/user/query/**").permitAll()
