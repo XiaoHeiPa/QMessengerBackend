@@ -137,6 +137,9 @@ public class UserController {
         if (invitationRedisTemplate.opsForValue().getAndDelete(Const.INVITATION + code) == null) {
             return RestBean.failure(404, "Invite code expired or not found.");
         }
+        if (accountService.findAccountByNameOrEmail(name) != null) {
+            return RestBean.failure(409, "Account already exists.");
+        }
         Account newAccount = new Account();
         newAccount.setRole(Roles.USER.name());
         newAccount.setUsername(name);
