@@ -137,8 +137,17 @@ public class UserController {
         if (invitationRedisTemplate.opsForValue().getAndDelete(Const.INVITATION + code) == null) {
             RestBean.failure(404, "Invite code expired or not found.");
         }
-        // todo
-        return RestBean.success();
+        Account newAccount = new Account();
+        newAccount.setRole(Roles.USER.name());
+        newAccount.setUsername(name);
+        newAccount.setEmail(email);
+        newAccount.setPassword(passwordEncoder.encode(password));
+        newAccount.setNickname(name);
+        newAccount.setRegisterTime(new Date().getTime());
+        if (accountService.save(newAccount)) {
+            return RestBean.success();
+        }
+        return RestBean.failure(500, "Server error.");
     }
 
     @PostMapping("/register")
