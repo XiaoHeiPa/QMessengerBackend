@@ -158,7 +158,7 @@ public class UserController {
         return RestBean.failure(500, "Server error.");
     }
 
-    private Account genAccount(String name, String email, String password) {
+    private @NotNull Account genAccount(String name, String email, String password) {
         Account newAccount = new Account();
         newAccount.setRole(Roles.USER.name());
         newAccount.setUsername(name);
