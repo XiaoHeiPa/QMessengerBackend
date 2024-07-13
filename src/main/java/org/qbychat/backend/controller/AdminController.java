@@ -30,7 +30,7 @@ public class AdminController {
     @Resource
     GroupsServiceImpl groupsService;
     @Resource
-    RedisTemplate<String, Invitation> invitationRedisTemplate;
+    RedisTemplate<String, Object> invitationRedisTemplate;
     @Value("${messenger.registration.invitation.expire}")
     private int invitationExpire;
 

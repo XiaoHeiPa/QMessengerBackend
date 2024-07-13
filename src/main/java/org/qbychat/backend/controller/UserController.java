@@ -48,7 +48,7 @@ public class UserController {
     @Resource
     private FriendsServiceImpl friendsService;
     @Resource
-    RedisTemplate<String, Invitation> invitationRedisTemplate;
+    RedisTemplate<String, Object> invitationRedisTemplate;
 
     @Resource
     private JwtUtils jwtUtils;
@@ -125,7 +125,7 @@ public class UserController {
 
     @GetMapping("/register/{code}")
     public RestBean<Invitation> inviteCodeInfo(@PathVariable("code") String code, HttpServletRequest request) {
-        Invitation invitation = invitationRedisTemplate.opsForValue().get(Const.INVITATION + code);
+        Invitation invitation = (Invitation) invitationRedisTemplate.opsForValue().get(Const.INVITATION + code);
         if (invitation == null) {
             return RestBean.failure(404, "Invite code expired or not found.");
         }
