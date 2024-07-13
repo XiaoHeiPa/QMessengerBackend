@@ -134,11 +134,11 @@ public class UserController {
 
     @PostMapping("/register/{code}")
     public RestBean<String> register(@PathVariable("code") String code, @RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password, HttpServletRequest request) {
-        if (invitationRedisTemplate.opsForValue().getAndDelete(Const.INVITATION + code) == null) {
-            return RestBean.failure(404, "Invite code expired or not found.");
-        }
         if (accountService.findAccountByNameOrEmail(name) != null) {
             return RestBean.failure(409, "Account already exists.");
+        }
+        if (invitationRedisTemplate.opsForValue().getAndDelete(Const.INVITATION + code) == null) {
+            return RestBean.failure(404, "Invite code expired or not found.");
         }
         Account newAccount = new Account();
         newAccount.setRole(Roles.USER.name());
