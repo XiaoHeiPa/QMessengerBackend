@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.qbychat.backend.entity.*;
 import org.qbychat.backend.entity.dto.FriendDTO;
+import org.qbychat.backend.entity.dto.RegisterStateDTO;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.EmailServiceImpl;
 import org.qbychat.backend.service.impl.FriendsServiceImpl;
@@ -132,36 +133,32 @@ public class UserController {
         return RestBean.success(invitation);
     }
 
+    @GetMapping("/register/state")
+    public RestBean<RegisterStateDTO> registerState() {
+        RegisterStateDTO stateDTO = new RegisterStateDTO();
+        stateDTO.setAllowed(allowRegister);
+        return RestBean.success(stateDTO);
+    }
+
     @PostMapping("/register/{code}")
     public RestBean<String> register(@PathVariable("code") String code, @RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password, HttpServletRequest request) {
+        if (allowRegister)
+            return RestBean.failure(405, "Invitation code is not allowed here, please use the common register API.");
         if (accountService.findAccountByNameOrEmail(name) != null) {
             return RestBean.failure(409, "Account already exists.");
         }
         if (invitationRedisTemplate.opsForValue().getAndDelete(Const.INVITATION + code) == null) {
             return RestBean.failure(404, "Invite code expired or not found.");
         }
-        Account newAccount = new Account();
-        newAccount.setRole(Roles.USER.name());
-        newAccount.setUsername(name);
-        newAccount.setEmail(email);
-        newAccount.setPassword(passwordEncoder.encode(password));
-        newAccount.setNickname(name);
-        newAccount.setRegisterTime(new Date().getTime());
+
+        Account newAccount = genAccount(name, email, password);
         if (accountService.save(newAccount)) {
             return RestBean.success();
         }
         return RestBean.failure(500, "Server error.");
     }
 
-    @PostMapping("/register")
-    public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) {
-        if (!allowRegister) return RestBean.failure(405, "Register is not allowed at this moment :(");
-        if (accountService.findAccountByNameOrEmail(name) != null) {
-            return RestBean.failure(401, "User exist.");
-        }
-        if (accountService.findAccountByNameOrEmail(email) != null) {
-            return RestBean.failure(401, "Email exist.");
-        }
+    private Account genAccount(String name, String email, String password) {
         Account newAccount = new Account();
         newAccount.setRole(Roles.USER.name());
         newAccount.setUsername(name);
@@ -169,6 +166,19 @@ public class UserController {
         newAccount.setPassword(passwordEncoder.encode(password));
         newAccount.setNickname(name);
         newAccount.setRegisterTime(new Date().getTime());
+        return newAccount;
+    }
+
+    @PostMapping("/register")
+    public RestBean<String> registerUser(@RequestParam("username") String name, @RequestParam("email") String email, @RequestParam String password) {
+        if (!allowRegister) return RestBean.failure(405, "Register without an invite code is not allowed at this moment :(");
+        if (accountService.findAccountByNameOrEmail(name) != null) {
+            return RestBean.failure(401, "User exist.");
+        }
+        if (accountService.findAccountByNameOrEmail(email) != null) {
+            return RestBean.failure(401, "Email exist.");
+        }
+        Account newAccount = genAccount(name, email, password);
         UUID newAccountUuid = UUID.randomUUID();
         redisTemplate.opsForValue().set(ACCOUNT_VERIFY + newAccountUuid, newAccount);
         Email verifyEmail = new Email();
@@ -222,7 +232,7 @@ public class UserController {
     }
 
     @GetMapping("/avatar")
-    public void avatar(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws Exception{
+    public void avatar(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws Exception {
         String name = request.getUserPrincipal().getName();
         Account user = accountService.findAccountByNameOrEmail(name);
         Integer id = user.getId();
