@@ -53,7 +53,7 @@ public class AdminController {
 
     @GetMapping("/register/invite")
     public RestBean<Invitation> generateInviteCode(HttpServletRequest request) {
-        if (!allowRegistration) return RestBean.failure(405, "Invite code is current disabled in application.yml");
+        if (allowRegistration) return RestBean.failure(405, "Invite code is current disabled in application.yml");
         Account admin = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         UUID uuid = UUID.randomUUID();
         Invitation invitation = new Invitation();
