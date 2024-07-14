@@ -36,6 +36,15 @@ public class GroupController {
         return RestBean.success(group);
     }
 
+    @GetMapping("join")
+    public RestBean<String> join(@PathParam("id") int id) {
+        Group group = groupsService.getGroupById(id);
+        if (group == null) return RestBean.failure(404, "Group not found");
+        group.getMembers().add(id);
+        groupsService.updateGroup(group);
+        return RestBean.success();
+    }
+
     @PostMapping("create")
     public RestBean<String> createGroup(@RequestParam String name, HttpServletRequest request) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());

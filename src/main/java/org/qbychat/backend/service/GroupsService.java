@@ -22,4 +22,6 @@ public interface GroupsService extends IService<Group> {
     boolean hasGroup(Integer id);
 
     List<Group> queryJoinedGroups(Account user);
+
+    void updateGroup(Group group);
 }

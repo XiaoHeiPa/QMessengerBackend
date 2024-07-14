@@ -77,6 +77,11 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
     }
 
     @Override
+    public void updateGroup(Group group) {
+        this.mapper.update(group);
+    }
+
+    @Override
     public boolean hasGroup(String name) {
         return this.getGroupByName(name) != null;
     }
