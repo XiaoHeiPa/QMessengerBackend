@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 /**
  * 实体类。
  *
@@ -27,7 +25,7 @@ public class Account implements BaseData {
     private String email;
     private String bio = "Default bio.";
     private String password;
-    private String role;
+    private Role role;
     @Column(value = "registerTime")
     private long registerTime;
     private String nickname;

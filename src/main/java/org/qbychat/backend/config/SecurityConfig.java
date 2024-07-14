@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
-import org.qbychat.backend.entity.Roles;
+import org.qbychat.backend.entity.Role;
 import org.qbychat.backend.entity.vo.AuthorizeVO;
 import org.qbychat.backend.filter.CorsFilter;
 import org.qbychat.backend.filter.JwtAuthorizeFilter;
@@ -60,7 +60,7 @@ public class SecurityConfig {
                                 .requestMatchers("/find-device/**").authenticated()
                                 .requestMatchers("/group/**").authenticated()
                                 .requestMatchers("/ws/**").permitAll()
-                                .requestMatchers("/admin/**").hasRole(Roles.ADMIN.name())
+                                .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
                                 .anyRequest().permitAll()
                 )
                 .formLogin(

@@ -4,7 +4,7 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.UpdateEntity;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.qbychat.backend.entity.Account;
-import org.qbychat.backend.entity.Roles;
+import org.qbychat.backend.entity.Role;
 import org.qbychat.backend.entity.table.AccountsTableDef;
 import org.qbychat.backend.mapper.AccountMapper;
 import org.qbychat.backend.service.AccountService;
@@ -29,7 +29,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         }
         return User.withUsername(username)
                 .password(account.getPassword())
-                .roles(account.getRole())
+                .roles(account.getRole().name())
                 .build();
     }
 
@@ -49,9 +49,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     }
 
     @Override
-    public void updateRole(Account account, Roles role) {
+    public void updateRole(Account account, Role role) {
         Account newAccount = UpdateEntity.of(Account.class, account.getId());
-        newAccount.setRole(role.name());
+        newAccount.setRole(role);
         this.updateUser(newAccount);
     }
 
