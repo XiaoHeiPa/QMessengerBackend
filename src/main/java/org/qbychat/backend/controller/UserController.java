@@ -315,6 +315,7 @@ public class UserController {
 
     @PostMapping("/username")
     public RestBean<String> updateUsername(@NotNull HttpServletRequest request, @RequestParam String newUsername) {
+        if (accountService.findAccountByNameOrEmail(newUsername) != null) return RestBean.failure(409, "Username" + newUsername + " was taken.");
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         account.setUsername(newUsername);
         accountService.updateUser(account);
