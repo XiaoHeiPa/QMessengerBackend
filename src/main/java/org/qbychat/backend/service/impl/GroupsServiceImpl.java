@@ -61,7 +61,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
     }
 
     @Override
-    public Group getGroupByName(String groupName) {
+    public Group findGroupByName(String groupName) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(GROUPS.ALL_COLUMNS)
                 .where(GROUPS.GROUP_NAME.eq(groupName));
@@ -69,7 +69,7 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
     }
 
     @Override
-    public Group getGroupById(Integer id) {
+    public Group findGroupById(Integer id) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(GROUPS.ALL_COLUMNS)
                 .where(GROUPS.ID.eq(id));
@@ -83,12 +83,12 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
 
     @Override
     public boolean hasGroup(String name) {
-        return this.getGroupByName(name) != null;
+        return this.findGroupByName(name) != null;
     }
 
     @Override
     public boolean hasGroup(Integer id) {
-        return this.getGroupById(id) != null;
+        return this.findGroupById(id) != null;
     }
 
     @Override

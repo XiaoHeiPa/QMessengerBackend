@@ -21,7 +21,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,7 +69,7 @@ public class QMessengerHandler extends AuthedTextHandler {
                 if (chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
                     sendMessage(session, msgResponse, chatMessage.getTo(), chatMessage, account);
                 } else if (!chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
-                    Group group = groupsService.getGroupById(chatMessage.getTo());
+                    Group group = groupsService.findGroupById(chatMessage.getTo());
                     for (Integer memberId : group.getMembers()) {
                         sendMessage(session, msgResponse, memberId, chatMessage, account);
                     }
@@ -101,7 +100,7 @@ public class QMessengerHandler extends AuthedTextHandler {
                 if (data.isDirectMessage()) {
                     messages = messageService.fetchLatestDirectMessages(channel, account.getId());
                 } else {
-                    Group group = groupsService.getGroupById(channel);
+                    Group group = groupsService.findGroupById(channel);
                     if (group.getMembers().contains(account.getId())) {
                         messages = messageService.fetchLatestGroupMessages(channel);
                     } else {

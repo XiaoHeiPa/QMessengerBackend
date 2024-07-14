@@ -231,6 +231,44 @@ public class UserController {
         return RestBean.success(groups);
     }
 
+    @GetMapping("/channels/list")
+    public RestBean<List<Channel>> getChannels(@NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        List<Group> groups = groupsService.queryJoinedGroups(user);
+        List<Account> friends = friendsService.getFriendsWithAccount(user);
+        List<Channel> channels = new ArrayList<>();
+        for (Account friend : friends) {
+            channels.add(new Channel(friend.getId(), friend.getNickname(), friend.getUsername(), true));
+        }
+        for (Group group: groups) {
+            channels.add(new Channel(group.getId(), group.getShownName(), group.getName(), true));
+        }
+        return RestBean.success(channels);
+    }
+
+    @GetMapping("/channels/info/{name}")
+    public RestBean<Channel> channelInfo(@PathVariable("name") String name) {
+        Account user = accountService.findAccountByNameOrEmail(name);
+        Group group = groupsService.findGroupByName(name);
+        if (user != null) {
+            Channel channel = new Channel();
+            channel.setId(user.getId());
+            channel.setName(user.getUsername());
+            channel.setTitle(user.getNickname());
+            channel.setDirectMessage(true);
+            return RestBean.success(channel);
+        }
+        if (group != null) {
+            Channel channel = new Channel();
+            channel.setId(group.getId());
+            channel.setName(group.getName());
+            channel.setTitle(group.getShownName());
+            channel.setDirectMessage(true);
+            return RestBean.success(channel);
+        }
+        return RestBean.failure(404, "Channel not found.");
+    }
+
     @GetMapping("/avatar")
     public void avatar(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws Exception {
         String name = request.getUserPrincipal().getName();

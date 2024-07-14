@@ -20,7 +20,7 @@ public class GroupController {
 
     @GetMapping("query/id/{id}")
     public RestBean<Group> queryById(@PathVariable("id") int id) {
-        Group group = groupsService.getGroupById(id);
+        Group group = groupsService.findGroupById(id);
         if (group == null) {
             return RestBean.failure(404, "Group not found");
         }
@@ -29,7 +29,7 @@ public class GroupController {
 
     @GetMapping("query/name/{name}")
     public RestBean<Group> query(@PathVariable String name) {
-        Group group = groupsService.getGroupByName(name);
+        Group group = groupsService.findGroupByName(name);
         if (group == null) {
             return RestBean.failure(404, "Group not found");
         }
@@ -38,7 +38,7 @@ public class GroupController {
 
     @GetMapping("join")
     public RestBean<String> join(@PathParam("id") int id) {
-        Group group = groupsService.getGroupById(id);
+        Group group = groupsService.findGroupById(id);
         if (group == null) return RestBean.failure(404, "Group not found");
         group.getMembers().add(id);
         groupsService.updateGroup(group);

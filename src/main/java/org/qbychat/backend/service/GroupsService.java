@@ -13,9 +13,9 @@ public interface GroupsService extends IService<Group> {
     void addMember(Group group, Account member);
     void removeMember(Group group, Account member);
 
-    Group getGroupByName(String groupName);
+    Group findGroupByName(String groupName);
 
-    Group getGroupById(Integer id);
+    Group findGroupById(Integer id);
 
     boolean hasGroup(String name);
 
