@@ -47,7 +47,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                // user requests
                 .authorizeHttpRequests(
                         conf -> conf
                                 .requestMatchers("/user/login").anonymous()
@@ -57,6 +56,7 @@ public class SecurityConfig {
                                 .requestMatchers("/group/query/**").permitAll()
                                 .requestMatchers("/user/query/**").permitAll()
                                 .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/avatar/query").permitAll()
                                 .requestMatchers("/find-device/**").authenticated()
                                 .requestMatchers("/group/**").authenticated()
                                 .requestMatchers("/ws/**").permitAll()

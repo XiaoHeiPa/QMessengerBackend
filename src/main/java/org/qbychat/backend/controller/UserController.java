@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.*;
 
 import static org.qbychat.backend.QMessengerBackendApplication.CONFIG_DIR;
@@ -286,16 +287,52 @@ public class UserController {
         }
     }
 
+    @PostMapping("/avatar")
+    public RestBean<String> updateAvatar(@NotNull HttpServletRequest request) throws Exception {
+        Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        File avatarFile = new File(CONFIG_DIR, "avatar/" + "users" + "/" + account.getId() + ".png");
+        try (FileOutputStream stream = new FileOutputStream(avatarFile)) {
+            IOUtils.copy(request.getInputStream(), stream);
+        }
+        return RestBean.success();
+    }
+
+    @PostMapping("/nickname")
+    public RestBean<String> updateNickname(@NotNull HttpServletRequest request, @RequestParam String newNickname) {
+        Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        account.setNickname(newNickname);
+        accountService.updateUser(account);
+        return RestBean.success();
+    }
+
+    @PostMapping("/bio")
+    public RestBean<String> updateBio(@NotNull HttpServletRequest request, @RequestParam String newBio) {
+        Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        account.setBio(newBio);
+        accountService.updateUser(account);
+        return RestBean.success();
+    }
+
+    @PostMapping("/username")
+    public RestBean<String> updateUsername(@NotNull HttpServletRequest request, @RequestParam String newUsername) {
+        Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        account.setUsername(newUsername);
+        accountService.updateUser(account);
+        return RestBean.success();
+    }
+
     @PostMapping("/fcm/token")
     public RestBean<String> updateFCMToken(@RequestParam("newToken") String token, HttpServletRequest request) {
         String username = request.getUserPrincipal().getName();
         Account user = accountService.findAccountByNameOrEmail(username);
+        log.info("FCM token of {} updated. New token is {}", username, token);
         stringRedisTemplate.opsForValue().set(Const.FCM_TOKEN + user.getId(), token);
         return RestBean.success("Token updated.");
     }
 
     @GetMapping("/fcm/token")
     public RestBean<String> getFCMToken(HttpServletRequest request) {
+        // TODO 直接传String是不利于向下兼容的, 后续需要使用DTO来传输数据
         String username = request.getUserPrincipal().getName();
         Account user = accountService.findAccountByNameOrEmail(username);
         String token = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + user.getId());
