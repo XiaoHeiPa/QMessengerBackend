@@ -160,7 +160,7 @@ public class UserController {
 
     private @NotNull Account genAccount(String name, String email, String password) {
         Account newAccount = new Account();
-        newAccount.setRole(Role.USER.name());
+        newAccount.setRole(Role.USER);
         newAccount.setUsername(name);
         newAccount.setEmail(email);
         newAccount.setPassword(passwordEncoder.encode(password));

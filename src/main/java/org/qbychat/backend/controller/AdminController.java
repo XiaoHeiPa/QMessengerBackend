@@ -3,6 +3,7 @@ package org.qbychat.backend.controller;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.IOUtils;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Invitation;
 import org.qbychat.backend.entity.RestBean;
@@ -15,9 +16,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.qbychat.backend.QMessengerBackendApplication.CONFIG_DIR;
 
 @Log4j2
 @RestController
@@ -41,32 +47,53 @@ public class AdminController {
         return "Hello admin";
     }
 
-    @PostMapping("/manage/{user}/role")
+    @PostMapping("/manage/user/{user}/role")
     public RestBean<String> updateRole(@PathVariable("user") String username, @RequestParam("role") Role role, HttpServletRequest request) {
         if (request.getUserPrincipal().getName().equals(username)) {
             return RestBean.failure(403, "You cannot modify your role.");
         }
         Account account = accountService.findAccountByNameOrEmail(username);
-        account.setRole(role.name());
+        account.setRole(role);
         accountService.updateUser(account);
         return RestBean.success();
     }
 
-    @PostMapping("/manage/{user}/username")
-    public RestBean<String> updateUsername(@PathVariable("user") String user, String newUsername) {
+    @PostMapping("/manage/user/{user}/username")
+    public RestBean<String> updateUsername(@PathVariable("user") Integer user, @RequestParam String newUsername) {
         if (accountService.findAccountByNameOrEmail(newUsername) != null) return RestBean.failure(409, "Username " + newUsername + " already exists.");
-        if (accountService.findAccountByNameOrEmail(user) == null) return RestBean.failure(404, "Account does not exist.");
-        Account account = accountService.findAccountByNameOrEmail(user);
+        Account account = accountService.findAccountById(user);
+        if (account == null) return RestBean.failure(404, "Account does not exist.");
         account.setUsername(newUsername);
         accountService.updateUser(account);
         return RestBean.success();
     }
 
-    @PostMapping("/manage/{user}/nickname")
-    public RestBean<String> updateNickname(@PathVariable("user") String user, String newNickname) {
-        Account account = accountService.findAccountByNameOrEmail(user);
+    @PostMapping("/manage/user/{user}/nickname")
+    public RestBean<String> updateNickname(@PathVariable("user") Integer user, @RequestParam String newNickname) {
+        Account account = accountService.findAccountById(user);
+        if (account == null) return RestBean.failure(404, "Account does not exist.");
         account.setNickname(newNickname);
         accountService.updateUser(account);
+        return RestBean.success();
+    }
+
+    @PostMapping("/manage/user/{user}/bio")
+    public RestBean<String> updateBio(@PathVariable("user") Integer user, @RequestParam String bio) {
+        Account account = accountService.findAccountById(user);
+        if (account == null) return RestBean.failure(404, "Account does not exist.");
+        account.setBio(bio);
+        accountService.updateUser(account);
+        return RestBean.success();
+    }
+
+    @PostMapping("/manage/user/{user}/avatar")
+    public RestBean<String> updateAvatar(@PathVariable("user") String user, HttpServletRequest request) throws Exception {
+        Account account = accountService.findAccountByNameOrEmail(user);
+        if (account == null) return RestBean.failure(404, "Account does not exist.");
+        File avatarFile = new File(CONFIG_DIR, "avatar/" + "users" + "/" + account.getId() + ".png");
+        try (FileOutputStream stream = new FileOutputStream(avatarFile)) {
+            IOUtils.copy(request.getInputStream(), stream);
+        }
         return RestBean.success();
     }
 
@@ -99,7 +126,7 @@ public class AdminController {
         account.setPassword(passwordEncoder.encode(password));
         account.setEmail(email);
         account.setRegisterTime(new Date().getTime());
-        account.setRole(Objects.requireNonNullElse(role, Role.USER).name());
+        account.setRole(Objects.requireNonNullElse(role, Role.USER));
         if (nickname != null) {
             account.setNickname(nickname);
         } else {
