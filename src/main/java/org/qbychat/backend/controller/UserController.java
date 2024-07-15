@@ -299,15 +299,6 @@ public class UserController {
         return RestBean.success();
     }
 
-    @PostMapping("/account/username")
-    public RestBean<String> updateUsername(@NotNull HttpServletRequest request, @RequestParam String newUsername) {
-        if (accountService.findAccountByNameOrEmail(newUsername) != null) return RestBean.failure(409, "Username" + newUsername + " was taken.");
-        Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        account.setUsername(newUsername);
-        accountService.updateUser(account);
-        return RestBean.success();
-    }
-
     @PostMapping("/fcm/token")
     public RestBean<String> updateFCMToken(@RequestParam("newToken") String token, HttpServletRequest request) {
         String username = request.getUserPrincipal().getName();
