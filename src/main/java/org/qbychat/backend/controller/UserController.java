@@ -77,31 +77,6 @@ public class UserController {
         return RestBean.success(accountService.findAccountByNameOrEmail(name));
     }
 
-    @PostMapping("/account/username")
-    public RestBean<String> changeUsername(@RequestParam("value") String username, @NotNull HttpServletRequest request) {
-        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        if (accountService.findAccountByNameOrEmail(username) != null || groupsService.hasGroup(username)) {
-            return RestBean.failure(409, "Username was taken.");
-        }
-        accountService.updateUsername(user, username);
-        // logout current client
-        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
-            return RestBean.success("Username changed.");
-        }
-        return RestBean.failure(500, "username changed, but failed to logout.");
-    }
-
-    @PostMapping("/account/password")
-    public RestBean<String> changePassword(@RequestParam("value") String password, @NotNull HttpServletRequest request) {
-        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        accountService.updatePassword(user, passwordEncoder.encode(password));
-        // logout current client
-        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
-            return RestBean.success("Password changed.");
-        }
-        return RestBean.failure(500, "Password changed, but failed to logout.");
-    }
-
     @GetMapping("/query/id/{id}")
     public RestBean<Account> query(@PathVariable Integer id) {
         Account account = accountService.findAccountById(id);
@@ -297,6 +272,31 @@ public class UserController {
         account.setBio(newBio);
         accountService.updateUser(account);
         return RestBean.success();
+    }
+
+    @PostMapping("/account/username")
+    public RestBean<String> changeUsername(@RequestParam("value") String username, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        if (accountService.findAccountByNameOrEmail(username) != null || groupsService.hasGroup(username)) {
+            return RestBean.failure(409, "Username was taken.");
+        }
+        accountService.updateUsername(user, username);
+        // logout current client
+        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
+            return RestBean.success("Username changed.");
+        }
+        return RestBean.failure(500, "username changed, but failed to logout.");
+    }
+
+    @PostMapping("/account/password")
+    public RestBean<String> changePassword(@RequestParam("value") String password, @NotNull HttpServletRequest request) {
+        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        accountService.updatePassword(user, passwordEncoder.encode(password));
+        // logout current client
+        if (jwtUtils.invalidateJwt(request.getHeader("Authorization"))) {
+            return RestBean.success("Password changed.");
+        }
+        return RestBean.failure(500, "Password changed, but failed to logout.");
     }
 
     @PostMapping("/fcm/token")

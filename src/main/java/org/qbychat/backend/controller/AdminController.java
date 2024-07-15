@@ -11,6 +11,7 @@ import org.qbychat.backend.entity.Role;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.utils.Const;
+import org.qbychat.backend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +38,8 @@ public class AdminController {
     GroupsServiceImpl groupsService;
     @Resource
     RedisTemplate<String, Object> invitationRedisTemplate;
+    @Resource
+    JwtUtils jwtUtils;
     @Value("${messenger.registration.invitation.expire}")
     private int invitationExpire;
     @Value("${messenger.registration.allow}")
@@ -65,7 +68,7 @@ public class AdminController {
         if (account == null) return RestBean.failure(404, "Account does not exist.");
         account.setUsername(newUsername);
         accountService.updateUser(account);
-        return RestBean.success();
+        return RestBean.success("Password changed.");
     }
 
     @PostMapping("/manage/user/{user}/nickname")
