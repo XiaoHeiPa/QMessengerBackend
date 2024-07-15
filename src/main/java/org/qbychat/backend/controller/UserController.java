@@ -91,20 +91,6 @@ public class UserController {
         return RestBean.failure(500, "username changed, but failed to logout.");
     }
 
-    @PostMapping("/account/nickname")
-    public RestBean<String> changeNickname(@RequestParam("value") String nickname, @NotNull HttpServletRequest request) {
-        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        accountService.updateNickname(user, nickname);
-        return RestBean.success("Nickname changed.");
-    }
-
-    @PostMapping("/account/bio")
-    public RestBean<String> changeBio(@RequestParam("value") String bio, @NotNull HttpServletRequest request) {
-        Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
-        accountService.updateBio(user, bio);
-        return RestBean.success("Bio changed.");
-    }
-
     @PostMapping("/account/password")
     public RestBean<String> changePassword(@RequestParam("value") String password, @NotNull HttpServletRequest request) {
         Account user = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
@@ -270,7 +256,7 @@ public class UserController {
         return RestBean.failure(404, "Channel not found.");
     }
 
-    @GetMapping("/avatar")
+    @GetMapping("/account/avatar")
     public void avatar(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws Exception {
         String name = request.getUserPrincipal().getName();
         Account user = accountService.findAccountByNameOrEmail(name);
@@ -287,7 +273,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/avatar")
+    @PostMapping("/account/avatar")
     public RestBean<String> updateAvatar(@NotNull HttpServletRequest request) throws Exception {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         File avatarFile = new File(CONFIG_DIR, "avatar/" + "users" + "/" + account.getId() + ".png");
@@ -297,7 +283,7 @@ public class UserController {
         return RestBean.success();
     }
 
-    @PostMapping("/nickname")
+    @PostMapping("/account/nickname")
     public RestBean<String> updateNickname(@NotNull HttpServletRequest request, @RequestParam String newNickname) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         account.setNickname(newNickname);
@@ -305,7 +291,7 @@ public class UserController {
         return RestBean.success();
     }
 
-    @PostMapping("/bio")
+    @PostMapping("/account/bio")
     public RestBean<String> updateBio(@NotNull HttpServletRequest request, @RequestParam String newBio) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         account.setBio(newBio);
@@ -313,7 +299,7 @@ public class UserController {
         return RestBean.success();
     }
 
-    @PostMapping("/username")
+    @PostMapping("/account/username")
     public RestBean<String> updateUsername(@NotNull HttpServletRequest request, @RequestParam String newUsername) {
         if (accountService.findAccountByNameOrEmail(newUsername) != null) return RestBean.failure(409, "Username" + newUsername + " was taken.");
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
