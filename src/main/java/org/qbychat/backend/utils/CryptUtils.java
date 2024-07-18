@@ -25,13 +25,7 @@ public class CryptUtils {
         byte[] encryptedBytes = cipher.doFinal(input);
 
         // Encode bytes to base64 to get a string
-        String encryptedString = Base64.getEncoder().encodeToString(encryptedBytes);
-        System.out.println("Encrypted String (AES): " + encryptedString);
-
-        // Decrypt the string
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedString));
-        return new String(decryptedBytes);
+        return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     public byte[] decrypt(byte[] cipherText) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {

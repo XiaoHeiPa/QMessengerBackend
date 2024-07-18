@@ -67,9 +67,14 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // 找到目标并发送
                 chatMessage.setSender(account.getId());
                 Response msgResponse = chatMessage.toResponse();
+
+                ChatMessage.MessageContent content = chatMessage.getContent();
+                content.setText(cryptUtils.encryptString(content.getText()));
+                chatMessage.setContent(content);
+                log.info("Sending message: {}", cryptUtils.encryptString(content.getText()));
+
                 messageService.addMessage(chatMessage);
                 // direct message
-                FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");
                 if (chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
                     sendMessage(session, msgResponse, chatMessage.getTo(), chatMessage, account);
                 } else if (!chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
@@ -121,14 +126,13 @@ public class QMessengerHandler extends AuthedTextHandler {
     }
 
     private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account account) throws IOException, FirebaseMessagingException {
-        FirebaseMessaging firebaseMessaging;
+        FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");;
         chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
         session.sendMessage(new TextMessage(msgResponse.toJson()));
         WebSocketSession targetSession = connections.get(to);
         if (targetSession != null) {
             targetSession.sendMessage(new TextMessage(msgResponse.toJson()));
         }
-        firebaseMessaging = app.getBean("firebaseMessaging");
         String targetFCMToken = stringRedisTemplate.opsForValue().get(Const.FCM_TOKEN + to);
         if (targetFCMToken == null) return;
         firebaseMessaging.send(

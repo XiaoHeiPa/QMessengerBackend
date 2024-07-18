@@ -21,13 +21,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Value("${messenger.message.page.size}")
     private int pageSize;
 
-    @Resource
-    CryptUtils encryptUtils;
-
     @SneakyThrows
     @Override
     public void addMessage(ChatMessage message) {
-        message.getContent().setText(encryptUtils.encryptString(message.getContent().getText()));
         this.mapper.insert(message);
     }
 

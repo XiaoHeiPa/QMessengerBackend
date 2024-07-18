@@ -16,6 +16,7 @@ import java.util.Calendar;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 @Table(value = "db_messages")
 public class ChatMessage implements BaseData {
     @Id(keyType = KeyType.Auto)
