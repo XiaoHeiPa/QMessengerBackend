@@ -13,6 +13,7 @@ import org.qbychat.backend.service.impl.FriendsServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
 import org.qbychat.backend.service.impl.MessageServiceImpl;
 import org.qbychat.backend.utils.Const;
+import org.qbychat.backend.utils.CryptUtils;
 import org.qbychat.backend.utils.QMsgAppContextAware;
 import org.qbychat.backend.ws.entity.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -41,6 +42,9 @@ public class QMessengerHandler extends AuthedTextHandler {
 
     @Resource
     QMsgAppContextAware app;
+
+    @Resource
+    CryptUtils cryptUtils;
 
     public static ConcurrentHashMap<Integer, WebSocketSession> connections = new ConcurrentHashMap<>();
 
@@ -109,6 +113,7 @@ public class QMessengerHandler extends AuthedTextHandler {
                 }
                 for (ChatMessage chatMessage : messages) {
                     chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
+                    chatMessage.getContent().setText(new String(cryptUtils.decryptString(chatMessage.getContent().getText())));
                     session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
                 }
             }

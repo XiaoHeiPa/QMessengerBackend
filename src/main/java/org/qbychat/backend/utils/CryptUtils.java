@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 @Component
-public class EncryptUtils {
+public class CryptUtils {
     @Value("${messenger.message.secret-key}")
     String secretKey;
 

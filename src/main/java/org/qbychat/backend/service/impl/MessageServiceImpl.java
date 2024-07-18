@@ -7,7 +7,7 @@ import lombok.SneakyThrows;
 import org.qbychat.backend.entity.ChatMessage;
 import org.qbychat.backend.mapper.MessageMapper;
 import org.qbychat.backend.service.MessageService;
-import org.qbychat.backend.utils.EncryptUtils;
+import org.qbychat.backend.utils.CryptUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     private int pageSize;
 
     @Resource
-    EncryptUtils encryptUtils;
+    CryptUtils encryptUtils;
 
     @SneakyThrows
     @Override
