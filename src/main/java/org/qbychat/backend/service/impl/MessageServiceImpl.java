@@ -2,9 +2,12 @@ package org.qbychat.backend.service.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
+import lombok.SneakyThrows;
 import org.qbychat.backend.entity.ChatMessage;
 import org.qbychat.backend.mapper.MessageMapper;
 import org.qbychat.backend.service.MessageService;
+import org.qbychat.backend.utils.EncryptUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +21,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Value("${messenger.message.page.size}")
     private int pageSize;
 
+    @Resource
+    EncryptUtils encryptUtils;
+
+    @SneakyThrows
     @Override
     public void addMessage(ChatMessage message) {
+        ChatMessage.MessageContent content = message.getContent();
+        content.setText(encryptUtils.encryptString(content.getText()));
         this.mapper.insert(message);
     }
 

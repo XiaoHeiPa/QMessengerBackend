@@ -33,6 +33,8 @@ messenger:
   verify:
     email-verify-url: http://localhost:8080/user/apply-register?uuid=
   message:
+    # Key length MUST equal 16
+    secret-key: powered-by-zzyss
     page:
       size: 100
   registration:
