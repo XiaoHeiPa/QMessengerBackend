@@ -27,8 +27,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @SneakyThrows
     @Override
     public void addMessage(ChatMessage message) {
-        ChatMessage.MessageContent content = message.getContent();
-        content.setText(encryptUtils.encryptString(content.getText()));
+        message.getContent().setText(encryptUtils.encryptString(message.getContent().getText()));
         this.mapper.insert(message);
     }
 
