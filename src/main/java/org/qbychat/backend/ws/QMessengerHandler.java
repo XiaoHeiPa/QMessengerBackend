@@ -21,7 +21,12 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,21 +71,15 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // send message
                 // 找到目标并发送
                 chatMessage.setSender(account.getId());
-                Response msgResponse = chatMessage.toResponse();
-
-                ChatMessage.MessageContent content = chatMessage.getContent();
-                content.setText(cryptUtils.encryptString(content.getText()));
-                chatMessage.setContent(content);
-                log.info("Sending message: {}", cryptUtils.encryptString(content.getText()));
 
                 messageService.addMessage(chatMessage);
                 // direct message
                 if (chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
-                    sendMessage(session, msgResponse, chatMessage.getTo(), chatMessage, account);
+                    sendMessage(session, chatMessage.getTo(), chatMessage, account);
                 } else if (!chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
                     Group group = groupsService.findGroupById(chatMessage.getTo());
                     for (Integer memberId : group.getMembers()) {
-                        sendMessage(session, msgResponse, memberId, chatMessage, account);
+                        sendMessage(session, memberId, chatMessage, account);
                     }
                 }
             }
@@ -118,16 +117,18 @@ public class QMessengerHandler extends AuthedTextHandler {
                 }
                 for (ChatMessage chatMessage : messages) {
                     chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
-                    chatMessage.getContent().setText(new String(cryptUtils.decryptString(chatMessage.getContent().getText())));
                     session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
                 }
             }
         }
     }
 
-    private void sendMessage(@NotNull WebSocketSession session, Response msgResponse, int to, ChatMessage chatMessage, Account account) throws IOException, FirebaseMessagingException {
+    private void sendMessage(@NotNull WebSocketSession session, int to, @NotNull ChatMessage chatMessage0, Account account) throws IOException, FirebaseMessagingException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, CloneNotSupportedException {
+        ChatMessage chatMessage = chatMessage0.clone();
+        chatMessage.getContent().setText(new String(cryptUtils.decryptString(chatMessage.getContent().getText())));
         FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");;
         chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
+        Response msgResponse = chatMessage.toResponse();
         session.sendMessage(new TextMessage(msgResponse.toJson()));
         WebSocketSession targetSession = connections.get(to);
         if (targetSession != null) {

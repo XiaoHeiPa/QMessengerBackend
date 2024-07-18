@@ -18,7 +18,7 @@ import java.util.Calendar;
 @EqualsAndHashCode
 @ToString
 @Table(value = "db_messages")
-public class ChatMessage implements BaseData {
+public class ChatMessage implements BaseData, Cloneable {
     @Id(keyType = KeyType.Auto)
     private Integer id;
 
@@ -57,5 +57,10 @@ public class ChatMessage implements BaseData {
         String text;
         @Builder.Default
         Integer replyTo = null;
+    }
+
+    @Override
+    public ChatMessage clone() throws CloneNotSupportedException {
+        return (ChatMessage) super.clone();
     }
 }
