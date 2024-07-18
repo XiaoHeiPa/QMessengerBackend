@@ -62,6 +62,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Override
     public List<ChatMessage> fetchLatestDirectMessages(int user1, int user2) {
         List<ChatMessage> records  = new ArrayList<>();
+        queryMessages(user1, user2, records);
+        queryMessages(user2, user1, records);
+        return records;
+    }
+
+    private void queryMessages(int user1, int user2, List<ChatMessage> records) {
         QueryWrapper qw = new QueryWrapper();
         qw.select(MESSAGES.ALL_COLUMNS)
                 .where(MESSAGES.SENDER.eq(user1))
@@ -74,19 +80,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         if (total / pageSize > 1) {
             records.addAll(this.mapper.paginate(total / pageSize, pageSize, qw).getRecords());
         }
-        QueryWrapper qw1 = new QueryWrapper();
-        qw1.select(MESSAGES.ALL_COLUMNS)
-                .where(MESSAGES.SENDER.eq(user2))
-                .and(MESSAGES.TO.eq(user1))
-                .and(MESSAGES.IS_DM.eq(true));
-        int total1 = this.mapper.selectListByQuery(qw1).size();
-        if (total1 / pageSize < 1) {
-            records.addAll(this.mapper.paginate(1, pageSize, qw1).getRecords());
-        }
-        if (total1 / pageSize > 1) {
-            records.addAll(this.mapper.paginate(total1 / pageSize, pageSize, qw1).getRecords());
-        }
-        return records;
     }
 
     @Override
