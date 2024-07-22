@@ -40,6 +40,6 @@ public class CryptUtils {
     }
 
     public byte[] decryptString(String encrypted) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        return this.decrypt(encrypted.getBytes());
+        return this.decrypt(Base64.getDecoder().decode(encrypted));
     }
 }

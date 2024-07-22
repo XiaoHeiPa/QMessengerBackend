@@ -72,14 +72,14 @@ public class QMessengerHandler extends AuthedTextHandler {
                 // 找到目标并发送
                 chatMessage.setSender(account.getId());
 
-                messageService.addMessage(chatMessage);
+                messageService.addMessage(chatMessage.clone());
                 // direct message
                 if (chatMessage.isDirectMessage() && accountService.hasUser(chatMessage.getTo())) {
-                    sendMessage(session, chatMessage.getTo(), chatMessage, account);
+                    sendMessage(session, chatMessage.getTo(), chatMessage.clone(), account);
                 } else if (!chatMessage.isDirectMessage() && groupsService.hasGroup(chatMessage.getTo())) {
                     Group group = groupsService.findGroupById(chatMessage.getTo());
                     for (Integer memberId : group.getMembers()) {
-                        sendMessage(session, memberId, chatMessage, account);
+                        sendMessage(session, memberId, chatMessage.clone(), account);
                     }
                 }
             }
@@ -116,6 +116,10 @@ public class QMessengerHandler extends AuthedTextHandler {
                     }
                 }
                 for (ChatMessage chatMessage : messages) {
+                    ChatMessage.MessageContent content = chatMessage.getContent();
+                    content.setText(new String(cryptUtils.decryptString(content.getText())));
+                    chatMessage.setContent(content);
+
                     chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
                     session.sendMessage(chatMessage.toWSTextMessage()); // 排序在客户端进行
                 }
@@ -123,9 +127,11 @@ public class QMessengerHandler extends AuthedTextHandler {
         }
     }
 
-    private void sendMessage(@NotNull WebSocketSession session, int to, @NotNull ChatMessage chatMessage0, Account account) throws IOException, FirebaseMessagingException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, CloneNotSupportedException {
-        ChatMessage chatMessage = chatMessage0.clone();
-        chatMessage.getContent().setText(new String(cryptUtils.decryptString(chatMessage.getContent().getText())));
+    private void sendMessage(@NotNull WebSocketSession session, int to, @NotNull ChatMessage chatMessage, Account account) throws IOException, FirebaseMessagingException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, CloneNotSupportedException {
+//        ChatMessage.MessageContent content = chatMessage.getContent();
+//        content.setText(new String(cryptUtils.decryptString(content.getText())));
+//        chatMessage.setContent(content);
+
         FirebaseMessaging firebaseMessaging = app.getBean("firebaseMessaging");;
         chatMessage.setSenderInfo(accountService.findAccountById(chatMessage.getSender()));
         Response msgResponse = chatMessage.toResponse();
