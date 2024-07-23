@@ -6,9 +6,14 @@ import jakarta.websocket.server.PathParam;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.Group;
 import org.qbychat.backend.entity.RestBean;
+import org.qbychat.backend.entity.Role;
 import org.qbychat.backend.service.impl.AccountServiceImpl;
 import org.qbychat.backend.service.impl.GroupsServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/group")
@@ -17,6 +22,9 @@ public class GroupController {
     GroupsServiceImpl groupsService;
     @Resource
     private AccountServiceImpl accountService;
+
+    @Value("${messenger.message.page.size}")
+    private int pageSize;
 
     @GetMapping("query/id/{id}")
     public RestBean<Group> queryById(@PathVariable("id") int id) {
@@ -34,6 +42,22 @@ public class GroupController {
             return RestBean.failure(404, "Group not found");
         }
         return RestBean.success(group);
+    }
+
+    @GetMapping("member/{id}")
+    public RestBean<List<Account>> queryMembers(@PathVariable("id") int groupId, @RequestParam int page, HttpServletRequest request) {
+        Group group = groupsService.findGroupById(groupId);
+        if (group == null) {
+            return RestBean.failure(404, "Group not found");
+        }
+        Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
+        if (!(account.getRole().equals(Role.ADMIN) || group.getMembers().contains(account.getId()))) {
+            return RestBean.failure(403, "No permission");
+        }
+        List<Account> result = new ArrayList<>();
+        // todo query page
+
+        return RestBean.success(result);
     }
 
     @GetMapping("join")
