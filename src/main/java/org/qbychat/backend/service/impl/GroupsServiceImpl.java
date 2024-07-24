@@ -10,10 +10,7 @@ import org.qbychat.backend.mapper.GroupMapper;
 import org.qbychat.backend.service.GroupsService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.qbychat.backend.entity.table.GroupsTableDef.GROUPS;
 
@@ -79,6 +76,28 @@ public class GroupsServiceImpl extends ServiceImpl<GroupMapper, Group> implement
     @Override
     public void updateGroup(Group group) {
         this.mapper.update(group);
+    }
+
+    @Override
+    public List<Integer> queryMembers(Group group, Integer pageSize, Integer pageNo) {
+        QueryWrapper qw = new QueryWrapper();
+        qw.select(GROUPS.MEMBERS).where(GROUPS.ID.eq(group.getId()));
+        Set<Integer> members = (Set<Integer>) this.mapper.selectObjectByQuery(qw);
+        List<Integer> result = new ArrayList<>(members);
+        Integer total  = result.size();
+        Integer reqCnt = total/pageSize;
+        return result.subList((pageNo-1)*pageSize, Math.min(total,pageNo*pageSize));
+    }
+
+    @Override
+    public List<Integer> queryMembers(Integer id, Integer pageSize, Integer pageNo) {
+        QueryWrapper qw = new QueryWrapper();
+        qw.select(GROUPS.MEMBERS).where(GROUPS.ID.eq(id));
+        Set<Integer> members = (Set<Integer>) this.mapper.selectObjectByQuery(qw);
+        List<Integer> result = new ArrayList<>(members);
+        Integer total  = result.size();
+        Integer reqCnt = total/pageSize;
+        return result.subList((pageNo-1)*pageSize, Math.min(total,pageNo*pageSize));
     }
 
     @Override

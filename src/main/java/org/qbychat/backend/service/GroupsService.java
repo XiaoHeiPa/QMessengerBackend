@@ -24,4 +24,8 @@ public interface GroupsService extends IService<Group> {
     List<Group> queryJoinedGroups(Account user);
 
     void updateGroup(Group group);
+
+    List<Integer> queryMembers(Group group, Integer pageSize, Integer pageNo);
+
+    List<Integer> queryMembers(Integer id, Integer pageSize, Integer pageNo);
 }
