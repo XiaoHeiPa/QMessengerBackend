@@ -48,8 +48,8 @@ public class GroupController {
     }
 
     @GetMapping("member/{id}")
-    @ApiOperation("通过查询id查询群聊成员")
-    public RestBean<List<Account>> queryMembers(@PathVariable("id") int groupId, @RequestParam int page, HttpServletRequest request) {
+    @ApiOperation("通过id查询群聊成员")
+    public RestBean<List<Account>> queryMembers(@PathVariable("id") int groupId, @RequestParam int pageSize,@RequestParam int page, HttpServletRequest request) {
         Group group = groupsService.findGroupById(groupId);
         if (group == null) {
             return RestBean.failure(404, "Group not found");
@@ -60,7 +60,10 @@ public class GroupController {
         }
         List<Account> result = new ArrayList<>();
 
-        //todo 分页
+        List<Integer> resPage = groupsService.queryMembers(group, pageSize, page);
+        for (Integer i: resPage){
+            result.add(accountService.findAccountById(i));
+        }
 
         return RestBean.success(result);
     }
