@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 .requestMatchers("/find-device/**").authenticated()
                                 .requestMatchers("/group/**").authenticated()
                                 .requestMatchers("/ws/**").permitAll()
+                                .requestMatchers("/swagger-**").permitAll()
                                 .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
                                 .anyRequest().permitAll()
                 )

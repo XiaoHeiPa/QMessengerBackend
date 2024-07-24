@@ -2,8 +2,11 @@ package org.qbychat.backend.service;
 
 import com.mybatisflex.core.service.IService;
 import org.qbychat.backend.entity.Account;
+import org.qbychat.backend.entity.ChatMessage;
 import org.qbychat.backend.entity.Role;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import java.util.List;
 
 /**
  * 服务层。
@@ -29,4 +32,5 @@ public interface AccountService extends IService<Account>, UserDetailsService {
 
 
     void updateBio(Account account, String bio);
+
 }

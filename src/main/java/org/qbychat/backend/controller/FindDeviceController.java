@@ -1,5 +1,6 @@
 package org.qbychat.backend.controller;
 
+import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.qbychat.backend.entity.Account;
@@ -28,12 +29,14 @@ public class FindDeviceController {
     private FindDeviceHandler handler;
 
     @GetMapping("device-list")
+    @ApiOperation("设备列表")
     public List<String> getMyDevices(HttpServletRequest request) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         return handler.findDeviceMeidsByAccount(account);
     }
 
     @GetMapping("query")
+    @ApiOperation("查询设备")
     public RestBean<Location> query(HttpServletRequest request, @RequestParam String meid) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         if (isOwnedDevice(account, meid)) {
@@ -50,6 +53,7 @@ public class FindDeviceController {
      * 向客户端发送消息以强制刷新位置
      * */
     @GetMapping("force-query")
+    @ApiOperation("强制刷新")
     public RestBean<String> force(HttpServletRequest request, @RequestParam String meid) throws Exception{
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         if (isOwnedDevice(account, meid)) {

@@ -58,6 +58,8 @@ dependencies {
     implementation("com.mybatis-flex:mybatis-flex-codegen:1.8.3")
     implementation("com.zaxxer:HikariCP:4.0.3")
     implementation("com.eatthepath:java-otp:0.4.0")
+    implementation("io.springfox:springfox-swagger2:2.9.2")
+    implementation("io.springfox:springfox-swagger-ui:2.9.2")
 }
 
 tasks.withType<Test> {
