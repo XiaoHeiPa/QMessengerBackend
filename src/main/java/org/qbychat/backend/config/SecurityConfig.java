@@ -115,6 +115,7 @@ public class SecurityConfig {
     private void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         request.setCharacterEncoding("utf-8");
+        response.setStatus(401);
         response.getWriter().write(RestBean.unauthorized(exception).toJson());
     }
 
