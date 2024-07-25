@@ -90,11 +90,13 @@ public class SecurityConfig {
 
     private void onAccessDeny(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
         response.setContentType("application/json;charset=utf-8");
+        response.setStatus(403);
         response.getWriter().write(RestBean.forbidden(exception).toJson());
     }
 
     private void onUnauthorized(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.setContentType("application/json;charset=utf-8");
+        response.setStatus(401);
         response.getWriter().write(RestBean.unauthorized(exception).toJson());
     }
 
