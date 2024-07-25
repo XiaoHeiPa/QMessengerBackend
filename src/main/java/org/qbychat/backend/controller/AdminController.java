@@ -1,6 +1,5 @@
 package org.qbychat.backend.controller;
 
-import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
@@ -47,13 +46,11 @@ public class AdminController {
     private boolean allowRegistration;
 
     @GetMapping("/ping")
-    @ApiOperation("admin-ping")
     public String ping() {
         return "Hello admin";
     }
 
     @PostMapping("/manage/user/{user}/role")
-    @ApiOperation("管理用户角色")
     public RestBean<String> updateRole(@PathVariable("user") String username, @RequestParam("role") Role role, HttpServletRequest request) {
         if (request.getUserPrincipal().getName().equals(username)) {
             return RestBean.failure(403, "You cannot modify your role.");
@@ -65,7 +62,6 @@ public class AdminController {
     }
 
     @PostMapping("/manage/user/{user}/username")
-    @ApiOperation("管理用户名字")
     public RestBean<String> updateUsername(@PathVariable("user") Integer user, @RequestParam String newUsername) {
         if (accountService.findAccountByNameOrEmail(newUsername) != null) return RestBean.failure(409, "Username " + newUsername + " already exists.");
         Account account = accountService.findAccountById(user);
@@ -76,7 +72,6 @@ public class AdminController {
     }
 
     @PostMapping("/manage/user/{user}/nickname")
-    @ApiOperation("管理用户昵称")
     public RestBean<String> updateNickname(@PathVariable("user") Integer user, @RequestParam String newNickname) {
         Account account = accountService.findAccountById(user);
         if (account == null) return RestBean.failure(404, "Account does not exist.");
@@ -86,7 +81,6 @@ public class AdminController {
     }
 
     @PostMapping("/manage/user/{user}/bio")
-    @ApiOperation("管理用户简介")
     public RestBean<String> updateBio(@PathVariable("user") Integer user, @RequestParam String bio) {
         Account account = accountService.findAccountById(user);
         if (account == null) return RestBean.failure(404, "Account does not exist.");
@@ -96,7 +90,6 @@ public class AdminController {
     }
 
     @PostMapping("/manage/user/{user}/avatar")
-    @ApiOperation("管理用户头像")
     public RestBean<String> updateAvatar(@PathVariable("user") String user, HttpServletRequest request) throws Exception {
         Account account = accountService.findAccountByNameOrEmail(user);
         if (account == null) return RestBean.failure(404, "Account does not exist.");
@@ -108,7 +101,6 @@ public class AdminController {
     }
 
     @GetMapping("/register/invite")
-    @ApiOperation("邀请")
     public RestBean<Invitation> generateInviteCode(HttpServletRequest request) {
         if (allowRegistration) return RestBean.failure(405, "Invite code is current disabled in application.yml");
         Account admin = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
@@ -125,7 +117,6 @@ public class AdminController {
      * Force register
      * */
     @PostMapping("/register")
-    @ApiOperation("强制注册")
     public RestBean<String> register(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("email") String email, @RequestParam(value = "nickname", required = false) String nickname, @RequestParam(value = "role", required = false) Role role, HttpServletRequest request) {
         if (accountService.hasUser(username)) {
             return RestBean.failure(409, "Account already exists.");
@@ -152,7 +143,6 @@ public class AdminController {
     }
 
     @PostMapping("/ban")
-    @ApiOperation("ban用户")
     public RestBean<String> ban(@RequestParam("username") String username, HttpServletRequest request) {
         Account account = accountService.findAccountByNameOrEmail(username);
         if (!account.isActive()) {
@@ -168,7 +158,6 @@ public class AdminController {
     }
 
     @PostMapping("pardon")
-    @ApiOperation("禁言用户")
     public RestBean<String> pardon(@RequestParam("username") String username, HttpServletRequest request) {
         Account account = accountService.findAccountByNameOrEmail(username);
         if (account.isActive()) {

@@ -1,6 +1,5 @@
 package org.qbychat.backend.controller;
 
-import io.swagger.annotations.ApiOperation;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.websocket.server.PathParam;
@@ -28,7 +27,6 @@ public class GroupController {
     private int pageSize;
 
     @GetMapping("query/id/{id}")
-    @ApiOperation("通过查询id查询群聊")
     public RestBean<Group> queryById(@PathVariable("id") int id) {
         Group group = groupsService.findGroupById(id);
         if (group == null) {
@@ -38,7 +36,6 @@ public class GroupController {
     }
 
     @GetMapping("query/name/{name}")
-    @ApiOperation("通过查询name查询群聊")
     public RestBean<Group> query(@PathVariable String name) {
         Group group = groupsService.findGroupByName(name);
         if (group == null) {
@@ -48,7 +45,6 @@ public class GroupController {
     }
 
     @GetMapping("member/{id}")
-    @ApiOperation("通过id查询群聊成员")
     public RestBean<List<Account>> queryMembers(@PathVariable("id") int groupId, @RequestParam int pageSize,@RequestParam int page, HttpServletRequest request) {
         Group group = groupsService.findGroupById(groupId);
         if (group == null) {
@@ -69,7 +65,6 @@ public class GroupController {
     }
 
     @GetMapping("join")
-    @ApiOperation("加入群聊")
     public RestBean<String> join(@PathParam("id") int id) {
         Group group = groupsService.findGroupById(id);
         if (group == null) return RestBean.failure(404, "Group not found");
@@ -79,7 +74,6 @@ public class GroupController {
     }
 
     @PostMapping("create")
-    @ApiOperation("创建群聊")
     public RestBean<String> createGroup(@RequestParam String name, HttpServletRequest request) {
         Account account = accountService.findAccountByNameOrEmail(request.getUserPrincipal().getName());
         if (groupsService.createGroup(account, name)) {

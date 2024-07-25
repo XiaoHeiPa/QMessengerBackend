@@ -41,4 +41,3 @@ messenger:
     allow: false
     invitation:
       expire: 7
-springfox.swagger2.enabled: true
