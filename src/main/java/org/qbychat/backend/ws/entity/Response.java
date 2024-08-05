@@ -17,6 +17,8 @@ public class Response {
     public static final Response FRIEND_REQUEST_SENT = new Response("friend-request-sent");
     public static final Response CHAT_MESSAGE = new Response("chat-message");
     public static final Response USER_INFO = new Response("user-info");
+    // mc client
+    public static final Response MULTI_LOGIN = new Response("multi-login");
 
     private Response(String method) {
         this.method = method;

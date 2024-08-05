@@ -1,5 +1,6 @@
 package org.qbychat.backend.config;
 
+import org.qbychat.backend.ws.ClientAuthHandler;
 import org.qbychat.backend.ws.QMessengerHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(handlerMessenger(), "/ws/messenger");
+        registry.addHandler(handlerClientAuth(), "/ws/mc");
+    }
+
+    @Bean
+    public ClientAuthHandler handlerClientAuth() {
+        return new ClientAuthHandler();
     }
 
     @Bean

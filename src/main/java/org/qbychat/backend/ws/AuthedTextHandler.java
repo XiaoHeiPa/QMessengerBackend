@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.qbychat.backend.entity.Account;
 import org.qbychat.backend.entity.RestBean;
 import org.qbychat.backend.entity.vo.AccountVO;
@@ -29,7 +30,7 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
      * 鉴权
      */
     @Override
-    public void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
+    public final void afterConnectionEstablished(@NotNull WebSocketSession session) throws Exception {
         Account account = getUser(session);
         if (account != null) {
             if (!account.isActive()) {
@@ -50,7 +51,7 @@ public abstract class AuthedTextHandler extends TextWebSocketHandler {
 
     protected void afterAuthorization(@NotNull WebSocketSession session, Account account) throws Exception {}
 
-    protected Account getUser(@NotNull WebSocketSession session) {
+    protected final @Nullable Account getUser(@NotNull WebSocketSession session) {
         List<String> authorization = session.getHandshakeHeaders().get("Authorization");
         if (authorization == null) {
             return null;
