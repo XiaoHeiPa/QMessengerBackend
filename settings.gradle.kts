@@ -4,4 +4,4 @@ buildscript{
         maven("https://maven.aliyun.com/repository/gradle-plugin")
     }
 }
-rootProject.name = "QMessengerBackend"
+rootProject.name = "RatBackend"
